@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import * as assert from 'node:assert'
 import { getAuthHeader, build } from '../../helper.js'
 import { buildCourse } from '../../../lib/data.js'
-import _ from 'lodash'
+import { pick } from 'es-toolkit'
 
 test('get courses', async (t) => {
   const app = await build(t)
@@ -55,7 +55,7 @@ test('patch courses/:id', async (t) => {
     headers: {
       ...authHeader,
     },
-    body: _.pick(buildCourse(), ['name', 'description']),
+    body: pick(buildCourse(), ['name', 'description']),
   })
   assert.equal(res.statusCode, 200, res.body)
 })
