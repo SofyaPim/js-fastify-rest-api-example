@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm'
 
 /**
  * @param {any} value
- * @param {{ schema: import('../types.ts').DrizzleSchema }} options
+ * @param {{ schema: import('../types/index.ts').DrizzleSchema }} options
  * @param {import('@vinejs/vine/types').FieldContext} field
  */
 async function unique(value, options, field,

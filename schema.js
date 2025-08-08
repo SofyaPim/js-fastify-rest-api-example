@@ -1,4 +1,3 @@
-/* eslint eslint-comments/no-unlimited-disable: off */
 /* eslint-disable */
 // This document was generated automatically by openapi-box
 
