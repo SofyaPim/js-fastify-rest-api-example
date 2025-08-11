@@ -15,7 +15,7 @@
 - `npm run dev`: Start Fastify with watch on http://localhost:3000.
 - `npm start`: Start in production mode.
 - `npm test` or `make test`: Run Node tests (`node --test`).
-- `make lint` / `make lint-fix`: Lint and autofix via ESLint.
+- `make lint` / `make lint-fix`: Lint and autofix.
 - `make check-types`: Type-check with `tsc` (JS + d.ts).
 - `make generate-types`: Compile TypeSpec and generate Fastify handler types.
 - `make migration-generate`: Generate Drizzle migrations.

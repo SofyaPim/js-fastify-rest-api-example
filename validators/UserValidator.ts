@@ -1,23 +1,23 @@
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: - */
 
-import vine from '@vinejs/vine';
-import { users } from '../db/schema.ts';
-import uniqueRule from '../rules/unique.ts';
-import type { DrizzleDB, User } from '../types/index.ts';
-
-const schema = vine.object({
-  email: vine
-    .string()
-    .email()
-    .normalizeEmail({ all_lowercase: true })
-    .use(uniqueRule({ schema: users })),
-});
-const validator = vine.compile(schema);
+import { email, objectAsync, parseAsync, pipeAsync, string, toLowerCase } from 'valibot'
+import { users } from '../db/schema.ts'
+import unique from '../rules/unique.ts'
+import type { DrizzleDB, User } from '../types/index.ts'
 
 class UserValidator {
-  static validate(db: DrizzleDB, data: User) {
-    return validator.validate(data, { meta: { db } });
+  static async validate(db: DrizzleDB, data: User) {
+    const schema = objectAsync({
+      email: pipeAsync(
+        string(),
+        email(),
+        toLowerCase(),
+        unique(db, { schema: users, field: 'email' }),
+      ),
+    })
+
+    return parseAsync(schema, data)
   }
 }
 
-export default UserValidator;
+export default UserValidator

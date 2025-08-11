@@ -5,7 +5,7 @@ dev:
 	npm run dev
 
 check-types:
-	npx tsc --noEmit
+	npx tsc
 
 routes:
 	npx fastify print-routes routes/api/users.js
@@ -14,10 +14,10 @@ migration-generate:
 	npx drizzle-kit generate
 
 lint:
-	npx eslint .
+	npx @biomejs/biome check
 
 lint-fix:
-	npx eslint --fix .
+	npx @biomejs/biome check --fix
 
 generate-openapi:
 	npx tsp compile .

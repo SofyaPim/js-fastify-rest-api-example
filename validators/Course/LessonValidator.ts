@@ -1,15 +1,17 @@
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: - */
 
-import vine from '@vinejs/vine';
-import type { CourseLessonInsert, DrizzleDB } from '../../types/index.ts';
+import type { CourseLessonInsert, DrizzleDB } from '../../types/index.ts'
+import { object, parseAsync, string } from 'valibot'
 
-const schema = vine.object({}).allowUnknownProperties();
-const validator = vine.compile(schema);
+const schema = object({
+  name: string(),
+  body: string(),
+})
 
 class LessonValidator {
-  static validate(db: DrizzleDB, data: CourseLessonInsert) {
-    return validator.validate(data, { meta: { db } });
+  static validate(_db: DrizzleDB, data: CourseLessonInsert) {
+    return parseAsync(schema, data)
   }
 }
 
-export default LessonValidator;
+export default LessonValidator

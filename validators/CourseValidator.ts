@@ -1,20 +1,19 @@
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: - */
 
-import vine from '@vinejs/vine';
-import type { CourseInsert, DrizzleDB } from '../types/index.ts';
+import type { CourseInsert, DrizzleDB } from '../types/index.ts'
+import { object, parseAsync, string } from 'valibot'
 
-const schema = vine
-  .object({
-    // name: vine.string(),
-    // description: vine.string(),
-  })
-  .allowUnknownProperties();
-const validator = vine.compile(schema);
+// Keep validation permissive: accept fields used by routes
+// and let handlers add/override creatorId.
+const schema = object({
+  name: string(),
+  description: string(),
+})
 
 class CourseValidator {
-  static validate(db: DrizzleDB, data: CourseInsert) {
-    return validator.validate(data, { meta: { db } });
+  static validate(_db: DrizzleDB, data: CourseInsert) {
+    return parseAsync(schema, data)
   }
 }
 
-export default CourseValidator;
+export default CourseValidator

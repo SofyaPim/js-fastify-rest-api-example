@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { AutoloadPluginOptions } from '@fastify/autoload';
 import AutoLoad from '@fastify/autoload';
-import { errors } from '@vinejs/vine';
+import { ValiError } from 'valibot'
 import type { FastifyPluginAsync, FastifyServerOptions } from 'fastify';
 import glue from 'fastify-openapi-glue';
 import serviceHandlers from './routes/index.ts';
@@ -18,18 +18,27 @@ const app: FastifyPluginAsync<AppOptions> = async (
   opts,
 ): Promise<void> => {
   fastify.setErrorHandler((error, _request, reply) => {
-    if (error instanceof errors.E_VALIDATION_ERROR) {
+    if (error instanceof ValiError) {
+      const errors = error.issues.map((issue) => {
+        const lastPathItem = issue.path && issue.path.length > 0 ? issue.path[issue.path.length - 1] : undefined
+        const field = lastPathItem && 'key' in lastPathItem && lastPathItem.key != null ? String(lastPathItem.key) : ''
+        return {
+          message: issue.message ?? 'Validation error',
+          rule: String(issue.type ?? 'validation'),
+          field,
+        }
+      })
       const errorDetail = {
         status: 422,
         title: 'Validation Error',
         detail: 'Errors related to business logic such as uniqueness',
-        errors: error.messages,
-      };
-      reply.type('application/problem+json').code(422).send(errorDetail);
+        errors,
+      }
+      reply.type('application/problem+json').code(422).send(errorDetail)
     } else {
-      reply.send(error);
+      reply.send(error)
     }
-  });
+  })
 
   fastify.addContentTypeParser(
     'application/problem+json',
