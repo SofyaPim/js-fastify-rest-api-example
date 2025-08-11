@@ -1,12 +1,19 @@
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: - */
 
-import { email, objectAsync, parseAsync, pipeAsync, string, toLowerCase } from 'valibot'
-import { users } from '../db/schema.ts'
-import unique from '../rules/unique.ts'
-import type { DrizzleDB, User } from '../types/index.ts'
+import {
+  email,
+  objectAsync,
+  parseAsync,
+  pipeAsync,
+  string,
+  toLowerCase,
+} from 'valibot';
+import { users } from '../db/schema.ts';
+import unique from '../rules/unique.ts';
+import type { DrizzleDB, User } from '../types/index.ts';
 
 class UserValidator {
-  static async validate(db: DrizzleDB, data: User) {
+  static async validate<T>(db: DrizzleDB, data: T) {
     const schema = objectAsync({
       email: pipeAsync(
         string(),
@@ -14,10 +21,10 @@ class UserValidator {
         toLowerCase(),
         unique(db, { schema: users, field: 'email' }),
       ),
-    })
+    });
 
-    return parseAsync(schema, data)
+    return parseAsync(schema, data);
   }
 }
 
-export default UserValidator
+export default UserValidator;

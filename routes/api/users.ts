@@ -1,9 +1,9 @@
 import { asc, eq } from 'drizzle-orm';
 
 import * as schemas from '../../db/schema.ts';
-import { getPagingOptions, openapi } from '../../lib/utils.ts';
+import { ensure, getPagingOptions } from '../../lib/utils.ts';
 import type { RouteHandlers } from '../../types/handlers/fastify.gen.ts';
-import type { User } from '../../types/index.ts';
+import type { UserCreateDto, UserEditDto } from '../../types/handlers/index.ts';
 import UserValidator from '../../validators/UserValidator.ts';
 
 export default {
@@ -20,12 +20,15 @@ export default {
     const user = await request.db.query.users.findFirst({
       where: eq(schemas.users.id, request.params.id),
     });
-    request.server.assert(user, 404);
+    ensure(reply, user, 404);
     return reply.code(200).send(user);
   },
 
   async usersCreate(request, reply) {
-    const validated = await UserValidator.validate(request.db, request.body as User);
+    const validated = await UserValidator.validate<UserCreateDto>(
+      request.db,
+      request.body,
+    );
     const [user] = await request.db
       .insert(schemas.users)
       .values(validated)
@@ -35,14 +38,16 @@ export default {
   },
 
   async usersUpdate(request, reply) {
-    const validated = await UserValidator.validate(request.db, request.body as User);
+    const validated = await UserValidator.validate<UserEditDto>(
+      request.db,
+      request.body,
+    );
     const [user] = await request.db
       .update(schemas.users)
       .set(validated)
       .where(eq(schemas.users.id, request.params.id))
       .returning();
-    request.server.assert(user, 404);
-
+    ensure(reply, user, 404);
     return reply.code(200).send(user);
   },
 
@@ -51,7 +56,7 @@ export default {
       .delete(schemas.users)
       .where(eq(schemas.users.id, request.params.id))
       .returning();
-    request.server.assert(user, 404);
+    ensure(reply, user, 404);
     return reply.code(204).send();
   },
 } satisfies Partial<RouteHandlers>;
