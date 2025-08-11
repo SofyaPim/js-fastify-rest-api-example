@@ -45,4 +45,3 @@ export default {
     return reply.code(201).send(lesson);
   },
 } satisfies Partial<RouteHandlers>;
-

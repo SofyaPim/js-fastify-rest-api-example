@@ -1,9 +1,9 @@
 import type { RouteHandlers } from '../types/handlers/fastify.gen.ts';
+import lessons from './api/courses/lessons.ts';
 import courses from './api/courses.ts';
 import tokens from './api/tokens.ts';
 import users from './api/users.ts';
 import root from './root.ts';
-import lessons from './api/courses/lessons.ts';
 
 const serviceHandlers: Partial<RouteHandlers> = {
   ...root,
