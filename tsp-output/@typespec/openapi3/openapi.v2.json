@@ -1,14 +1,14 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Hexlet Fastify Rest Api Example",
+    "title": "Rest API Example",
     "version": "v2"
   },
   "tags": [],
   "paths": {
     "/courses": {
       "get": {
-        "operationId": "courses_index",
+        "operationId": "coursesIndex",
         "parameters": [
           {
             "name": "page",
@@ -46,7 +46,7 @@
         }
       },
       "post": {
-        "operationId": "courses_create",
+        "operationId": "coursesCreate",
         "parameters": [],
         "responses": {
           "201": {
@@ -89,7 +89,7 @@
     },
     "/courses/{courseId}/lessons": {
       "get": {
-        "operationId": "courses_lessons_index",
+        "operationId": "coursesLessonsIndex",
         "parameters": [
           {
             "name": "courseId",
@@ -135,7 +135,7 @@
         }
       },
       "post": {
-        "operationId": "courses_lessons_create",
+        "operationId": "coursesLessonsCreate",
         "parameters": [
           {
             "name": "courseId",
@@ -197,7 +197,7 @@
     },
     "/courses/{courseId}/lessons/{id}": {
       "get": {
-        "operationId": "courses_lessons_show",
+        "operationId": "coursesLessonsShow",
         "parameters": [
           {
             "name": "courseId",
@@ -242,7 +242,7 @@
     },
     "/courses/{id}": {
       "get": {
-        "operationId": "courses_show",
+        "operationId": "coursesShow",
         "parameters": [
           {
             "name": "id",
@@ -276,8 +276,8 @@
           }
         }
       },
-      "patch": {
-        "operationId": "courses_update",
+      "put": {
+        "operationId": "coursesUpdate",
         "parameters": [
           {
             "name": "id",
@@ -347,7 +347,7 @@
         ]
       },
       "delete": {
-        "operationId": "courses_destroy",
+        "operationId": "coursesDestroy",
         "parameters": [
           {
             "name": "id",
@@ -392,7 +392,7 @@
     },
     "/tokens": {
       "post": {
-        "operationId": "tokens_create",
+        "operationId": "tokensCreate",
         "parameters": [],
         "responses": {
           "201": {
@@ -430,7 +430,7 @@
     },
     "/users": {
       "get": {
-        "operationId": "users_index",
+        "operationId": "usersIndex",
         "parameters": [
           {
             "name": "page",
@@ -473,7 +473,7 @@
         ]
       },
       "post": {
-        "operationId": "users_create",
+        "operationId": "usersCreate",
         "parameters": [],
         "responses": {
           "201": {
@@ -511,7 +511,7 @@
     },
     "/users/{id}": {
       "get": {
-        "operationId": "users_show",
+        "operationId": "usersShow",
         "parameters": [
           {
             "name": "id",
@@ -550,8 +550,8 @@
           }
         ]
       },
-      "patch": {
-        "operationId": "users_update",
+      "put": {
+        "operationId": "usersUpdate",
         "parameters": [
           {
             "name": "id",
@@ -611,7 +611,7 @@
         ]
       },
       "delete": {
-        "operationId": "users_destroy",
+        "operationId": "usersDestroy",
         "parameters": [
           {
             "name": "id",
@@ -667,8 +667,7 @@
         "required": [
           "id",
           "name",
-          "description",
-          "createdAt"
+          "description"
         ],
         "properties": {
           "id": {
@@ -679,10 +678,6 @@
           },
           "description": {
             "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -718,8 +713,7 @@
           "id",
           "courseId",
           "name",
-          "body",
-          "createdAt"
+          "body"
         ],
         "properties": {
           "id": {
@@ -733,10 +727,6 @@
           },
           "body": {
             "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -817,16 +807,7 @@
         "description": "https://www.rfc-editor.org/rfc/rfc9457.html"
       },
       "Timestamps": {
-        "type": "object",
-        "required": [
-          "createdAt"
-        ],
-        "properties": {
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
+        "type": "object"
       },
       "TokenInfo": {
         "type": "object",
@@ -908,24 +889,25 @@
         "type": "object",
         "required": [
           "id",
+          "fullName",
           "phone",
-          "email",
-          "createdAt"
+          "email"
         ],
         "properties": {
           "id": {
             "type": "number"
           },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 100
+          },
           "phone": {
             "type": "string"
           },
           "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
+            "type": "string"
           }
         }
       },
@@ -962,7 +944,7 @@
     "securitySchemes": {
       "BearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "Bearer"
       }
     }
   }

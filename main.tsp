@@ -2,19 +2,19 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@typespec/openapi3";
+import "@typespec/openapi";
 
 using TypeSpec.Versioning;
 using TypeSpec.Http;
-using TypeSpec.Rest;
+using TypeSpec.OpenAPI;
 
-@service({
-  title: "Hexlet Fastify Rest Api Example",
-})
+@service(#{ title: "Rest API Example" })
 @versioned(Versions)
 namespace FastifyRestApiExample;
 
 enum Versions {
-  v1, v2
+  v1,
+  v2,
 }
 
 /**
@@ -60,7 +60,7 @@ model UnprocessableEntityError {
 }
 
 model Timestamps {
-  createdAt: utcDateTime;
+  // createdAt: utcDateTime;
 }
 
 model User {
@@ -69,9 +69,10 @@ model User {
   @minLength(2)
   @maxLength(100)
   fullName: string | null;
+
   @added(Versions.v2) phone: string;
 
-  @format("email")
+  // @format("email")
   email: string;
 
   ...Timestamps;
@@ -127,6 +128,7 @@ model CourseLessonCreateDTO {
 
 @route("/users")
 namespace users {
+  @operationId("usersIndex")
   @get
   @useAuth(BearerAuth)
   op index(@query page?: numeric = 1): {
@@ -137,24 +139,28 @@ namespace users {
 
   @get
   @useAuth(BearerAuth)
+  @operationId("usersShow")
   op show(@path id: numeric): {
     @body _: User;
   } | NotFoundError;
 
   @post
+  @operationId("usersCreate")
   op create(@body _: UserCreateDTO): {
     @body _: User;
     @statusCode statusCode: 201;
   } | UnprocessableEntityError;
 
-  @patch
+  @put
   @useAuth(BearerAuth)
+  @operationId("usersUpdate")
   op update(@path id: numeric, @body user: UserEditDTO): {
     @body user: User;
   } | NotFoundError | UnprocessableEntityError;
 
   @delete
   @useAuth(BearerAuth)
+  @operationId("usersDestroy")
   op destroy(@path id: numeric): {
     @statusCode statusCode: 204;
   } | NotFoundError;
@@ -163,6 +169,7 @@ namespace users {
 @route("/tokens")
 namespace tokens {
   @post
+  @operationId("tokensCreate")
   op create(@body auth_info: AuthInfo): {
     @body token: TokenInfo;
     @statusCode statusCode: 201;
@@ -172,6 +179,7 @@ namespace tokens {
 @route("/courses")
 namespace courses {
   @get
+  @operationId("coursesIndex")
   op index(@query page?: numeric = 1): {
     @body courses: {
       data: Course[];
@@ -179,19 +187,22 @@ namespace courses {
   };
 
   @get
+  @operationId("coursesShow")
   op show(@path id: numeric): {
     @body course: Course;
   } | NotFoundError;
 
   @post
   @useAuth(BearerAuth)
+  @operationId("coursesCreate")
   op create(@body course: CourseCreateDTO): {
     @body course: Course;
     @statusCode statusCode: 201;
   } | UnprocessableEntityError;
 
-  @patch
+  @put
   @useAuth(BearerAuth)
+  @operationId("coursesUpdate")
   op update(@path id: numeric, @body course: CourseEditDTO):
     | {
         @body course: Course;
@@ -202,6 +213,7 @@ namespace courses {
 
   @delete
   @useAuth(BearerAuth)
+  @operationId("coursesDestroy")
   op destroy(@path id: numeric): {
     @statusCode statusCode: 204;
   } | NotFoundError | UnauthorizedError;
@@ -210,6 +222,7 @@ namespace courses {
 @route("/courses/{courseId}/lessons")
 namespace courses_lessons {
   @get
+  @operationId("coursesLessonsIndex")
   op index(@path courseId: numeric, @query page?: numeric = 1): {
     @body lessons: {
       data: CourseLesson[];
@@ -217,14 +230,17 @@ namespace courses_lessons {
   };
 
   @get
+  @operationId("coursesLessonsShow")
   op show(@path courseId: numeric, @path id: numeric): {
     @body lessons: CourseLesson;
   } | NotFoundError;
 
   @post
   @useAuth(BearerAuth)
+  @operationId("coursesLessonsCreate")
   op create(@path courseId: numeric, @body course: CourseLessonCreateDTO): {
     @body lesson: CourseLesson;
     @statusCode statusCode: 201;
   } | UnprocessableEntityError | UnauthorizedError;
 }
+

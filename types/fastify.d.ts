@@ -1,26 +1,44 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import * as schemas from '../db/schema.js'
-
-import { Type } from '@sinclair/typebox'
-import {
-  FastifyInstance,
+import type { drizzle } from 'drizzle-orm/better-sqlite3';
+import '@fastify/jwt';
+// import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+// import { Type } from '@sinclair/typebox'
+import type {
   FastifyBaseLogger,
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
   RawReplyDefaultExpression,
   RawRequestDefaultExpression,
-  RawServerDefault
-} from 'fastify'
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+  RawServerDefault,
+} from 'fastify';
+import type * as schemas from '../db/schema.ts';
 
 declare module 'fastify' {
-  interface FastifyInstance extends FastifyJwtNamespace<{ namespace: 'security' }> {
+  interface FastifyRequest {
     db: ReturnType<typeof drizzle<typeof schemas>>;
-    authenticate: () => Promise<void>;
   }
-  type FastifyTypebox = FastifyInstance<
-    RawServerDefault,
-    RawRequestDefaultExpression<RawServerDefault>,
-    RawReplyDefaultExpression<RawServerDefault>,
-    FastifyBaseLogger,
-    TypeBoxTypeProvider
-  >;
-};
+  interface FastifyInstance
+    extends FastifyJwtNamespace<{ namespace: 'security' }> {
+    db: ReturnType<typeof drizzle<typeof schemas>>;
+    authenticate: (
+      request: FastifyRequest,
+      reply: FastifyReply,
+    ) => Promise<void>;
+  }
+  // type FastifyTypebox = FastifyInstance<
+  //   RawServerDefault,
+  //   RawRequestDefaultExpression<RawServerDefault>,
+  //   RawReplyDefaultExpression<RawServerDefault>,
+  //   FastifyBaseLogger,
+  //   TypeBoxTypeProvider
+  // >;
+}
+
+declare module '@fastify/jwt' {
+  interface FastifyJWT {
+    payload: { id: number }; // payload type is used for signing and verifying
+    user: {
+      id: number;
+    }; // user type is return type of `request.user` object
+  }
+}

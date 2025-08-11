@@ -5,10 +5,10 @@ dev:
 	npm run dev
 
 check-types:
-	npx tsc
+	npx tsc --noEmit
 
 routes:
-	npx fastify print-routes routes/users.js
+	npx fastify print-routes routes/api/users.js
 
 migration-generate:
 	npx drizzle-kit generate
@@ -19,13 +19,15 @@ lint:
 lint-fix:
 	npx eslint --fix .
 
-types-to-openapi:
+generate-openapi:
 	npx tsp compile .
 
-types-to-typebox:
-	npx openapi-box ./tsp-output/@typespec/openapi3/openapi.v1.json
+generate-openapi-ts-types:
+# 	# npx openapi-box ./tsp-output/@typespec/openapi3/openapi.v1.json
+	# npx openapi-typescript ./tsp-output/@typespec/openapi3/openapi.v1.json -o types/openapi.ts
+	npx openapi-ts
 
-types: types-to-openapi types-to-typebox
+generate-types: generate-openapi generate-openapi-ts-types
 
 mock:
 	npx prism mock ./tsp-output/@typespec/openapi3/openapi.v1.json
