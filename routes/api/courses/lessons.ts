@@ -3,7 +3,7 @@ import { and, asc, eq } from 'drizzle-orm';
 import * as schemas from '../../../db/schema.ts';
 import { ensure, getPagingOptions } from '../../../lib/utils.ts';
 import type { RouteHandlers } from '../../../types/handlers/fastify.gen.ts';
-import type { CourseLesson } from '../../../types/index.ts';
+import type { CourseLessonCreateDto } from '../../../types/handlers/index.ts';
 import LessonValidator from '../../../validators/Course/LessonValidator.ts';
 
 export default {
@@ -30,14 +30,14 @@ export default {
 
   async coursesLessonsCreate(request, reply) {
     await request.jwtVerify();
-    const validated = await LessonValidator.validate(
+    const validated = await LessonValidator.validate<CourseLessonCreateDto>(
       request.db,
-      request.body as CourseLesson,
+      request.body,
     );
     const values = {
       ...validated,
       courseId: request.params.courseId,
-    } as CourseLesson;
+    };
     const [lesson] = await request.db
       .insert(schemas.courseLessons)
       .values(values)

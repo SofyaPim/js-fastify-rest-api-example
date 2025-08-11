@@ -3,7 +3,10 @@ import { asc, eq } from 'drizzle-orm';
 import * as schemas from '../../db/schema.ts';
 import { ensure, getPagingOptions } from '../../lib/utils.ts';
 import type { RouteHandlers } from '../../types/handlers/fastify.gen.ts';
-import type { Course } from '../../types/index.ts';
+import type {
+  CourseCreateDto,
+  CourseEditDto,
+} from '../../types/handlers/index.ts';
 import CourseValidator from '../../validators/CourseValidator.ts';
 
 export default {
@@ -26,16 +29,16 @@ export default {
 
   async coursesCreate(request, reply) {
     await request.jwtVerify();
-    const validated = await CourseValidator.validate(
+    const validated = await CourseValidator.validate<CourseCreateDto>(
       request.db,
-      request.body as Course,
+      request.body,
     );
     // attach creator id from auth if available
     const creatorId = request.user?.id;
     const values = {
       ...validated,
       creatorId: creatorId,
-    } as Course;
+    };
 
     const [course] = await request.db
       .insert(schemas.courses)
@@ -46,9 +49,9 @@ export default {
 
   async coursesUpdate(request, reply) {
     await request.jwtVerify();
-    const validated = await CourseValidator.validate(
+    const validated = await CourseValidator.validate<CourseEditDto>(
       request.db,
-      request.body as Course,
+      request.body,
     );
     const [course] = await request.db
       .update(schemas.courses)

@@ -36,7 +36,9 @@
                       }
                     }
                   },
-                  "required": ["data"]
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -123,7 +125,9 @@
                       }
                     }
                   },
-                  "required": ["data"]
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -454,7 +458,9 @@
                       }
                     }
                   },
-                  "required": ["data"]
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -643,7 +649,10 @@
     "schemas": {
       "AuthInfo": {
         "type": "object",
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "properties": {
           "email": {
             "type": "string"
@@ -655,7 +664,11 @@
       },
       "Course": {
         "type": "object",
-        "required": ["id", "name", "description"],
+        "required": [
+          "id",
+          "name",
+          "description"
+        ],
         "properties": {
           "id": {
             "type": "number"
@@ -670,7 +683,10 @@
       },
       "CourseCreateDTO": {
         "type": "object",
-        "required": ["name", "description"],
+        "required": [
+          "name",
+          "description"
+        ],
         "properties": {
           "name": {
             "type": "string"
@@ -693,7 +709,12 @@
       },
       "CourseLesson": {
         "type": "object",
-        "required": ["id", "courseId", "name", "body"],
+        "required": [
+          "id",
+          "courseId",
+          "name",
+          "body"
+        ],
         "properties": {
           "id": {
             "type": "number"
@@ -711,7 +732,10 @@
       },
       "CourseLessonCreateDTO": {
         "type": "object",
-        "required": ["name", "body"],
+        "required": [
+          "name",
+          "body"
+        ],
         "properties": {
           "name": {
             "type": "string"
@@ -787,7 +811,9 @@
       },
       "TokenInfo": {
         "type": "object",
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "properties": {
           "token": {
             "type": "string"
@@ -816,7 +842,9 @@
       },
       "UnprocessableEntityError": {
         "type": "object",
-        "required": ["errors"],
+        "required": [
+          "errors"
+        ],
         "properties": {
           "type": {
             "type": "string"
@@ -848,14 +876,23 @@
                   "type": "string"
                 }
               },
-              "required": ["message", "rule", "field"]
+              "required": [
+                "message",
+                "rule",
+                "field"
+              ]
             }
           }
         }
       },
       "User": {
         "type": "object",
-        "required": ["id", "fullName", "phone", "email"],
+        "required": [
+          "id",
+          "fullName",
+          "phone",
+          "email"
+        ],
         "properties": {
           "id": {
             "type": "number"
@@ -876,7 +913,9 @@
       },
       "UserCreateDTO": {
         "type": "object",
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "properties": {
           "fullName": {
             "type": "string"
@@ -896,7 +935,10 @@
       },
       "Versions": {
         "type": "string",
-        "enum": ["v1", "v2"]
+        "enum": [
+          "v1",
+          "v2"
+        ]
       }
     },
     "securitySchemes": {
