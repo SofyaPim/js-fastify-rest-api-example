@@ -15,6 +15,7 @@ migration-generate:
 
 lint:
 	npx @biomejs/biome check
+	npx tsc
 
 lint-fix:
 	npx @biomejs/biome check --fix
