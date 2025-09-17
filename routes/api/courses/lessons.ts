@@ -1,12 +1,11 @@
 import { and, asc, eq } from 'drizzle-orm';
 
 import * as schemas from '../../../db/schema.ts';
-import { ensure, getPagingOptions } from '../../../lib/utils.ts';
-import type { RouteHandlers } from '../../../types/handlers/fastify.gen.ts';
+import { defineHandlers, ensure, getPagingOptions } from '../../../lib/utils.ts';
 import type { CourseLessonCreateDto } from '../../../types/handlers/index.ts';
 import LessonValidator from '../../../validators/Course/LessonValidator.ts';
 
-export default {
+const handlers = defineHandlers({
   async coursesLessonsIndex(request, reply) {
     const page = request.query?.page ?? 1;
     const lessons = await request.db.query.courseLessons.findMany({
@@ -44,4 +43,6 @@ export default {
       .returning();
     return reply.code(201).send(lesson);
   },
-} satisfies Partial<RouteHandlers>;
+});
+
+export default handlers;

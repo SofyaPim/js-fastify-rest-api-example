@@ -1,10 +1,9 @@
 import { eq } from 'drizzle-orm';
 
 import * as schemas from '../../db/schema.ts';
-import { ensure } from '../../lib/utils.ts';
-import type { RouteHandlers } from '../../types/handlers/fastify.gen.ts';
+import { defineHandlers, ensure } from '../../lib/utils.ts';
 
-export default {
+const handlers = defineHandlers({
   async tokensCreate(request, reply) {
     const client = await request.db.query.users.findFirst({
       where: eq(schemas.users.email, request.body.email),
@@ -13,4 +12,6 @@ export default {
     const token = request.server.jwt.sign({ id: client.id });
     return reply.code(201).send({ token });
   },
-} satisfies Partial<RouteHandlers>;
+});
+
+export default handlers;

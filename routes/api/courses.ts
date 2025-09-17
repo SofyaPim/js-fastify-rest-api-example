@@ -1,15 +1,15 @@
 import { asc, eq } from 'drizzle-orm';
 
 import * as schemas from '../../db/schema.ts';
-import { ensure, getPagingOptions } from '../../lib/utils.ts';
-import type { RouteHandlers } from '../../types/handlers/fastify.gen.ts';
+import { defineHandlers, ensure, getPagingOptions } from '../../lib/utils.ts';
 import type {
-  CourseCreateDto,
-  CourseEditDto,
+    CourseCreateDto,
+    CourseEditDto,
 } from '../../types/handlers/index.ts';
 import CourseValidator from '../../validators/CourseValidator.ts';
 
-export default {
+
+const handlers = defineHandlers({
   async coursesIndex(request, reply) {
     const page = request.query?.page ?? 1;
     const courses = await request.db.query.courses.findMany({
@@ -33,7 +33,6 @@ export default {
       request.db,
       request.body,
     );
-    // attach creator id from auth if available
     const creatorId = request.user?.id;
     const values = {
       ...validated,
@@ -71,4 +70,6 @@ export default {
     ensure(reply, course, 404);
     return reply.code(204).send();
   },
-} satisfies Partial<RouteHandlers>;
+});
+
+export default handlers;

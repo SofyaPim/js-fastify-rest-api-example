@@ -1,12 +1,10 @@
 import { asc, eq } from 'drizzle-orm';
-
 import * as schemas from '../../db/schema.ts';
-import { ensure, getPagingOptions } from '../../lib/utils.ts';
-import type { RouteHandlers } from '../../types/handlers/fastify.gen.ts';
+import { defineHandlers, ensure, getPagingOptions } from '../../lib/utils.ts';
 import type { UserCreateDto, UserEditDto } from '../../types/handlers/index.ts';
 import UserValidator from '../../validators/UserValidator.ts';
 
-export default {
+const handlers = defineHandlers({
   async usersIndex(request, reply) {
     const page = request.query?.page ?? 1;
     const users = await request.db.query.users.findMany({
@@ -59,4 +57,6 @@ export default {
     ensure(reply, user, 404);
     return reply.code(204).send();
   },
-} satisfies Partial<RouteHandlers>;
+});
+
+export default handlers;
