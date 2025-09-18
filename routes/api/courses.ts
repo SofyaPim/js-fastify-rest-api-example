@@ -3,11 +3,10 @@ import { asc, eq } from 'drizzle-orm';
 import * as schemas from '../../db/schema.ts';
 import { defineHandlers, ensure, getPagingOptions } from '../../lib/utils.ts';
 import type {
-    CourseCreateDto,
-    CourseEditDto,
+  CourseCreateDto,
+  CourseEditDto,
 } from '../../types/handlers/index.ts';
 import CourseValidator from '../../validators/CourseValidator.ts';
-
 
 const handlers = defineHandlers({
   async coursesIndex(request, reply) {

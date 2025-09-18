@@ -1,7 +1,11 @@
 import { and, asc, eq } from 'drizzle-orm';
 
 import * as schemas from '../../../db/schema.ts';
-import { defineHandlers, ensure, getPagingOptions } from '../../../lib/utils.ts';
+import {
+  defineHandlers,
+  ensure,
+  getPagingOptions,
+} from '../../../lib/utils.ts';
 import type { CourseLessonCreateDto } from '../../../types/handlers/index.ts';
 import LessonValidator from '../../../validators/Course/LessonValidator.ts';
 
