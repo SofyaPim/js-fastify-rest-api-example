@@ -23,7 +23,7 @@
     "fastify-cli": "^7.4.0",
     "fastify-openapi-glue": "^4.9.2",
     "fastify-plugin": "^5.0.1",
-    "npm-check-updates": "^18.1.1",
+    "npm-check-updates": "^18.2.1",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
