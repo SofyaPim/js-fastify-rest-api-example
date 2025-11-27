@@ -14,7 +14,7 @@
     "@fastify/sensible": "^6.0.3",
     "@typespec/openapi": "^1.4.0",
     "drizzle-valibot": "^0.4.2",
-    "valibot": "^1.1.0",
+    "valibot": "^1.2.0",
     "ajv-formats": "^3.0.1",
     "better-sqlite3": "^12.2.0",
     "drizzle-orm": "^0.44.5",
