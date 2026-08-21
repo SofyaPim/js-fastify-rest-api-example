@@ -37,6 +37,13 @@ generate-openapi-ts-types:
 generate-types: generate-openapi generate-openapi-ts-types
 	pnpm --silent run format
 
+# Проверка, что сгенерированное закоммичено: перегенерируем и падаем, если
+# рабочее дерево изменилось. Ловит и забытый коммит, и сломанный генератор —
+# без этой цели поломка видна только тому, кто запустит генерацию руками.
+# Миграции drizzle сюда не входят намеренно: их автор создаёт осознанно.
+generate-check: generate-types
+	git diff --exit-code -- tsp-output types/handlers
+
 mock:
 	pnpm exec prism mock ./tsp-output/@typespec/openapi3/openapi.v1.json
 

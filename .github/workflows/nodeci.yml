@@ -34,6 +34,11 @@ jobs:
 
       - name: Install
         run: make install
+      # Генерация до линта: если сгенерированные типы и zod-схемы разошлись со
+      # спекой (или генератор сломан очередным обновлением), сборка падает
+      # здесь, а не при следующем ручном запуске генерации.
+      - name: Check generated code
+        run: make generate-check
       - name: Run linter
         run: make lint
       - name: Run tests
