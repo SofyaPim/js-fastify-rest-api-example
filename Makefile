@@ -7,6 +7,9 @@ dev:
 check-types:
 	pnpm exec tsc
 
+deps-update:
+	npx ncu -u
+
 routes:
 	pnpm exec fastify print-routes routes/api/users.js
 
