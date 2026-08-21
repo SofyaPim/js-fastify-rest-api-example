@@ -1,11 +1,15 @@
 # Что ncu (`make deps-update`) намеренно не обновляет.
 
-# typescript держим на линии 6.x. Причина: @hey-api/openapi-ts печатает код
-# через JS-API компилятора (ts.SyntaxKind и фабрику узлов), а typescript 7 —
-# нативный компилятор, этого API у него нет. С 7.x `pnpm exec openapi-ts`
-# падает на старте: «Cannot read properties of undefined (reading
-# 'AnyKeyword')», то есть генерация типов и zod-схем перестаёт работать целиком.
-# 6.x — последняя линия с полным JS-API; для `make check-types` разницы нет.
-# Reject снимаем, когда openapi-ts объявит поддержку 7.
+# @hey-api/openapi-ts держим на канале next. Причина: в 0.99.0 (latest)
+# генератор печатает код через JS-API компилятора — ts.SyntaxKind и фабрику
+# узлов, — которого у нативного typescript 7 нет: `pnpm exec openapi-ts` падает
+# с «Cannot read properties of undefined (reading 'AnyKeyword')», то есть
+# генерация типов обработчиков и zod-схем не работает совсем. В next это
+# исправлено, вывод байт в байт совпадает с 0.99.0.
+#
+# Для ncu «свежее» — это latest, поэтому без reject он предлагает откат на
+# 0.99.0 и снова ломает генерацию. Канал next обновляется руками:
+# `pnpm add -D @hey-api/openapi-ts@next`. Reject снимаем, когда поддержка
+# TS 7 выйдет в latest.
 reject:
-  - typescript
+  - "@hey-api/openapi-ts"
