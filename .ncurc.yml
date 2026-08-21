@@ -1,0 +1,11 @@
+# Что ncu (`make deps-update`) намеренно не обновляет.
+
+# typescript держим на линии 6.x. Причина: @hey-api/openapi-ts печатает код
+# через JS-API компилятора (ts.SyntaxKind и фабрику узлов), а typescript 7 —
+# нативный компилятор, этого API у него нет. С 7.x `pnpm exec openapi-ts`
+# падает на старте: «Cannot read properties of undefined (reading
+# 'AnyKeyword')», то есть генерация типов и zod-схем перестаёт работать целиком.
+# 6.x — последняя линия с полным JS-API; для `make check-types` разницы нет.
+# Reject снимаем, когда openapi-ts объявит поддержку 7.
+reject:
+  - typescript
