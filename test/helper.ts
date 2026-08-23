@@ -1,48 +1,53 @@
 import { onTestFinished } from "vitest";
 import assert from "node:assert";
-import helper from "fastify-cli/helper.js";
-import path from "path";
-import * as schemas from "../db/schema.ts";
 import { eq } from "drizzle-orm";
-import type { FastifyInstance } from "fastify";
+import Fastify, { type FastifyInstance } from "fastify";
+import fp from "fastify-plugin";
+import app from "../app.ts";
+import * as schemas from "../db/schema.ts";
+import { createClient, createConfig } from "../types/handlers/client/index.js";
 
-const AppPath = path.join(import.meta.dirname, "..", "app.ts");
+// Приложение собирается напрямую, а не через helper из fastify-cli. Тот грузит
+// app.ts сам, в обход трансформации vite: из-за этого весь app в тестах был
+// any, а покрытие показывало по обработчикам единицы процентов при живых
+// тестах на них.
+async function build(): Promise<FastifyInstance> {
+  const fastify = Fastify({ logger: { level: "error" } });
+  // fp снимает инкапсуляцию, и декораторы приложения (db, jwt) видны снаружи.
+  // В бою так не нужно — это только чтобы тесты могли дотянуться до базы.
+  fastify.register(fp(app));
+  await fastify.ready();
 
-// Fill in this config with all the configurations
-// needed for testing the application
-function config() {
-  return {
-    skipOverride: true,
-  };
+  onTestFinished(() => fastify.close());
+
+  return fastify;
 }
 
-function serverConfig() {
-  return {
-    logger: {
-      level: "error",
-      transport: {
-        target: "pino-pretty",
-        options: {
-          colorize: true,
-        },
-      },
-    },
-  };
+// Клиент, сгенерированный из той же спеки. Нужен настоящий сокет: SDK ходит
+// через fetch, а не через inject.
+//
+// Правило, по которому тесты разделены между buildClient() и build():
+// корректные запросы идут клиентом — URL, методы и формы тел тогда берутся из
+// контракта, а не переписываются руками. Запросы, нарушающие контракт
+// (страница вне диапазона, слишком короткое имя, обращение без токена),
+// остаются на app.inject(): клиент типизирован по спеке и выразить их просто
+// не даёт, а проверять их надо.
+async function buildClient() {
+  const app = await build();
+  await app.listen({ port: 0, host: "127.0.0.1" });
+
+  const address = app.server.address();
+  assert.ok(address && typeof address === "object");
+  const client = createClient(createConfig({ baseUrl: `http://127.0.0.1:${address.port}` }));
+
+  return { app, client };
 }
 
-async function build() {
-  // you can set all the options supported by the fastify CLI command
-  const argv = [AppPath];
-
-  // fastify-plugin ensures that all decorators
-  // are exposed for testing purposes, this is
-  // different from the production setup
-  const app = await helper.build(argv, config(), serverConfig());
-
-  // tear down our app after we are done
-  onTestFinished(() => app.close());
-
-  return app;
+// У SDK response необязателен: при сетевой ошибке его не будет. Тесты про
+// статусы, поэтому проверяем наличие один раз здесь.
+function responseOf(result: { response?: Response }): Response {
+  assert.ok(result.response, "client returned no response");
+  return result.response;
 }
 
 async function getAuthHeader(app: FastifyInstance, userId: number | null = null) {
@@ -55,4 +60,4 @@ async function getAuthHeader(app: FastifyInstance, userId: number | null = null)
   };
 }
 
-export { config, build, getAuthHeader };
+export { build, buildClient, getAuthHeader, responseOf };

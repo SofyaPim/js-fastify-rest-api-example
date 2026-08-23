@@ -1,25 +1,55 @@
 test:
 	pnpm test
 
+test-coverage:
+	pnpm exec vitest run --coverage
+
 dev:
 	pnpm run dev
 
 check-types:
 	pnpm exec tsc
 
+# ncu, а не npx: пакет стоит в devDependencies, и npx при его отсутствии молча
+# тянул бы из сети другую версию. Обычно обновления приносит dependabot — цель
+# нужна, когда хочется обновиться сразу и локально.
 deps-update:
-	npx ncu -u
+	pnpm exec ncu -u
 
+# Таблица маршрутов целиком: их регистрирует glue по спеке, отдельного файла
+# с маршрутами нет — печатать нужно приложение.
 routes:
-	pnpm exec fastify print-routes routes/api/users.js
+	pnpm exec fastify print-routes app.ts
 
 migration-generate:
 	pnpm exec drizzle-kit generate
+
+# Схема без миграции — молчаливая поломка: код ждёт колонку, которой в базе не
+# появится. Цель ловит это, перегенерировав и проверив, что ничего нового не
+# возникло. В generate-check миграции не входят намеренно: там речь про
+# сгенерированное из спеки, а миграцию автор создаёт осознанно.
+#
+# check вызывается флагами, а не через конфиг: читая drizzle.config.ts, он
+# принимает dialect за параметр AWS Data API и падает (drizzle-kit 0.31).
+migration-check:
+	pnpm exec drizzle-kit check --dialect sqlite --out ./drizzle
+	pnpm exec drizzle-kit generate
+	@test -z "$$(git status --porcelain drizzle)" || { \
+		echo "Схема изменилась без миграции — запустите make migration-generate:"; \
+		git status --porcelain drizzle; \
+		exit 1; \
+	}
 
 lint:
 	pnpm --silent run lint
 	pnpm exec tsc
 	pnpm --silent run format:check
+	$(MAKE) lint-openapi
+
+# Линт контракта: правила и причины отключений — в redocly.yaml. Гоняется по
+# сгенерированному, а не по main.tsp: проверять надо то, что видит клиент.
+lint-openapi:
+	pnpm exec redocly lint tsp-output/@typespec/openapi3/openapi.v1.json
 
 lint-fix:
 	pnpm --silent run lint:fix
@@ -44,12 +74,16 @@ generate-types: generate-openapi generate-openapi-ts-types
 generate-check: generate-types
 	git diff --exit-code -- tsp-output types/handlers
 
+# Контрактные тесты поверх спеки: см. комментарий в самом скрипте.
+contract-test:
+	./scripts/contract-test.sh
+
 mock:
 	pnpm exec prism mock ./tsp-output/@typespec/openapi3/openapi.v1.json
 
-tsp-build:
-
-.PHONY: test routes
-
 install:
 	pnpm install
+
+.PHONY: install test dev check-types deps-update routes migration-generate \
+	lint lint-fix generate-openapi generate-openapi-ts-types generate-types \
+	generate-check migration-check mock test-coverage lint-openapi contract-test

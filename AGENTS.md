@@ -2,39 +2,65 @@
 
 ## Project Structure & Module Organization
 
-- `app.js`: Fastify entry; autoloads `plugins/` and `routes/`.
-- `routes/`: HTTP handlers.
-- `plugins/`: App plugins (JWT auth, DB, sensible errors, response validation, route glue).
-- `db/`: Drizzle ORM schema and seeds; `drizzle/` holds generated migrations.
-- `lib/`: Utilities and test data builders.
-- `test/`: Node tests; helpers in `test/helper.js`, route specs in `test/routes/*.test.js`.
-- `types/`: ts types
-- `main.tsp`, `tsp-output/`: TypeSpec and generated OpenAPI/handler typings.
+- `app.ts`: Fastify entry; автозагружает `plugins/`, а маршруты регистрирует
+  `fastify-openapi-glue` по спеке. Здесь же обработчик ошибок (RFC 9457) и
+  securityHandlers.
+- `main.tsp`, `tsp-output/`: контракт на TypeSpec и сгенерированный из него
+  OpenAPI. Источник истины для всего остального.
+- `types/handlers/`: сгенерированное из OpenAPI — типы обработчиков, zod-схемы
+  и клиент. Руками не правится.
+- `routes/`: обработчики; `routes/index.ts` собирает их в полный
+  `RouteHandlers`, поэтому забытая операция — ошибка компиляции.
+- `plugins/`: конфиг (`env`), база, JWT, security-плагины, документация.
+- `db/`: схема Drizzle, сиды и публичные проекции; `drizzle/` — миграции.
+- `validators/`, `rules/`, `policies/`: бизнес-валидация, правила уровня базы,
+  права доступа.
+- `lib/`: утилиты, хеширование паролей, фабрики тестовых данных.
+- `test/`: спеки; бутстрап в `test/helper.ts`.
+- `scripts/`: contract-test.sh.
 
 ## Build, Test, and Development Commands
-- `npm run dev`: Start Fastify with watch on http://localhost:3000.
-- `npm start`: Start in production mode.
-- `npm test` or `make test`: Run Node tests (`node --test`).
-- `make lint` / `make lint-fix`: Lint and autofix.
-- `make check-types`: Type-check with `tsc` (JS + d.ts).
-- `make generate-types`: Compile TypeSpec and generate Fastify handler types.
-- `make migration-generate`: Generate Drizzle migrations.
-- `make mock`: Serve mocked API from generated OpenAPI.
+
+- `make install` — установка.
+- `make dev` — запуск с перезагрузкой на http://localhost:3000. Требует `.env`
+  (см. `.env.example`).
+- `make test` / `make test-coverage` — vitest, второй с порогами покрытия.
+- `make lint` / `make lint-fix` — oxlint, tsc, формат и линт спеки.
+- `make generate-types` — OpenAPI из TypeSpec и всё сгенерированное из него.
+- `make generate-check` — сгенерированное не разошлось со спекой.
+- `make migration-generate` / `make migration-check` — миграции и проверка, что
+  схема не менялась без миграции.
+- `make contract-test` — schemathesis по спеке (нужен uv).
+- `make mock` — мок-сервер по OpenAPI.
 
 ## Coding Style & Naming Conventions
-- **Modules**: ESM only (`type: module`). Prefer named exports; keep JSDoc types consistent with `types/`.
-- **Formatting**: 2-space indent, no semicolons; follow ESLint + `@stylistic` rules. Run `make lint` before committing.
-- **Files**: Group endpoints by resource in `routes/api/` (e.g., `routes/api/books.js`). Co-locate validators and serializers by domain when present.
+
+- **Модули**: ESM (`type: module`), TypeScript, импорты с расширением `.ts`.
+- **Формат**: oxfmt, линт oxlint. `make lint` перед коммитом; lefthook гоняет
+  формат и линт по staged-файлам автоматически.
+- **Контракт первичен**: новое поле, статус или операция сначала появляются в
+  `main.tsp`, потом `make generate-types`, потом код. Обратный порядок ловится
+  в CI.
 
 ## Testing Guidelines
-- **Framework**: Node built-in `node:test` with `app.inject()`; see `test/helper.js` for server bootstrap.
-- **Naming**: Place specs under `test/routes/` as `*.test.js` (e.g., `test/routes/users.test.js`).
-- **Scope**: Add success tests for each new/changed route. No coverage gate enforced.
+
+- **Фреймворк**: vitest. Спеки в `test/**/*.test.ts`.
+- **Клиент**: корректные запросы — через сгенерированный клиент
+  (`buildClient()`), нарушающие контракт — через `app.inject()` (`build()`):
+  клиент типизирован по спеке и выразить их не даёт.
+- **Покрытие**: пороги в `vitest.config.ts`, проверяются в CI.
+- **Контрактные тесты**: `make contract-test` генерирует запросы из OpenAPI —
+  им найдены почти все 5xx, которые здесь исправлены.
 
 ## Commit & Pull Request Guidelines
-- **Commits**: Use clear, imperative messages (optionally Conventional Commits). Reference issues when applicable.
-- **PRs**: Provide purpose, summary, linked issues, test plan, and example requests/responses (curl or HTTPie). Keep diffs focused.
+
+- **Коммиты**: conventional commits.
+- **PR**: заголовок обязан быть conventional commit — по нему release-please
+  определяет разряд версии (проверяется в `pr-title.yml`).
 
 ## Security & Configuration Tips
-- **Secrets**: Move JWT secret to env (e.g., `JWT_SECRET`) rather than hardcoding; use `.env` locally and never commit secrets.
-- **DB**: Current DB is in-memory SQLite (`plugins/drizzle.js`). Switch to file/real DB for persistence before production.
+
+- **Секреты**: конфиг проверяется схемой в `plugins/env.ts`. Без `JWT_SECRET`
+  от 32 символов приложение не поднимается. `.env` не коммитится.
+- **База**: in-memory SQLite (`plugins/drizzle.ts`), пересоздаётся при каждом
+  запуске. Для постоянного хранения нужен файл или настоящая СУБД.

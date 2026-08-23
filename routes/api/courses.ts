@@ -1,7 +1,9 @@
+import { httpErrors } from "@fastify/sensible";
 import { asc, eq } from "drizzle-orm";
 
 import * as schemas from "../../db/schema.ts";
 import { defineHandlers, ensure, getPagingOptions } from "../../lib/utils.ts";
+import CoursePolicy from "../../policies/CoursePolicy.ts";
 import CourseValidator from "../../validators/CourseValidator.ts";
 
 const handlers = defineHandlers({
@@ -18,42 +20,57 @@ const handlers = defineHandlers({
     const course = await request.db.query.courses.findFirst({
       where: eq(schemas.courses.id, request.params.id),
     });
-    ensure(reply, course, 404);
+    ensure(course, 404);
     return reply.code(200).send(course);
   },
 
   async coursesCreate(request, reply) {
-    await request.jwtVerify();
     const validated = await CourseValidator.validateCreate(request.db, request.body);
-    const creatorId = request.user?.id;
     const values = {
       ...validated,
-      creatorId: creatorId,
+      creatorId: request.user.id,
     };
 
     const [course] = await request.db.insert(schemas.courses).values(values).returning();
     return reply.code(201).send(course);
   },
 
+  // Курс читается до правки, а не правится сразу с returning: иначе проверить
+  // владельца не на чем, и любой аутентифицированный менял чужой курс.
   async coursesUpdate(request, reply) {
-    await request.jwtVerify();
+    const course = await request.db.query.courses.findFirst({
+      where: eq(schemas.courses.id, request.params.id),
+    });
+    ensure(course, 404);
+    if (!CoursePolicy.canUpdate(course, request.user.id)) {
+      throw httpErrors.forbidden("You can only change your own courses");
+    }
+
     const validated = await CourseValidator.validateEdit(request.db, request.body);
-    const [course] = await request.db
+    // Все поля CourseEditDTO необязательные, поэтому тело может оказаться
+    // пустым. drizzle на пустом set бросает «No values to set» — это был 500.
+    if (Object.keys(validated).length === 0) {
+      return reply.code(200).send(course);
+    }
+
+    const [updated] = await request.db
       .update(schemas.courses)
       .set(validated)
       .where(eq(schemas.courses.id, request.params.id))
       .returning();
-    ensure(reply, course, 404);
-    return reply.code(200).send(course);
+    return reply.code(200).send(updated);
   },
 
   async coursesDestroy(request, reply) {
-    await request.jwtVerify();
-    const [course] = await request.db
-      .delete(schemas.courses)
-      .where(eq(schemas.courses.id, request.params.id))
-      .returning();
-    ensure(reply, course, 404);
+    const course = await request.db.query.courses.findFirst({
+      where: eq(schemas.courses.id, request.params.id),
+    });
+    ensure(course, 404);
+    if (!CoursePolicy.canDestroy(course, request.user.id)) {
+      throw httpErrors.forbidden("You can only delete your own courses");
+    }
+
+    await request.db.delete(schemas.courses).where(eq(schemas.courses.id, request.params.id));
     return reply.code(204).send();
   },
 });

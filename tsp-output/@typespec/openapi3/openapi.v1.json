@@ -2,6 +2,10 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Rest API Example",
+    "license": {
+      "name": "ISC",
+      "url": "https://opensource.org/license/isc-license-txt"
+    },
     "version": "v1"
   },
   "tags": [],
@@ -9,13 +13,16 @@
     "/courses": {
       "get": {
         "operationId": "coursesIndex",
+        "summary": "Список курсов",
         "parameters": [
           {
             "name": "page",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "number",
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
               "default": 1
             },
             "explode": false
@@ -42,11 +49,32 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
           }
         }
       },
       "post": {
         "operationId": "coursesCreate",
+        "summary": "Создание курса",
         "parameters": [],
         "responses": {
           "201": {
@@ -59,12 +87,42 @@
               }
             }
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Client error",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnprocessableEntityError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -90,13 +148,16 @@
     "/courses/{courseId}/lessons": {
       "get": {
         "operationId": "coursesLessonsIndex",
+        "summary": "Список уроков курса",
         "parameters": [
           {
             "name": "courseId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           },
           {
@@ -104,7 +165,9 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "number",
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
               "default": 1
             },
             "explode": false
@@ -131,18 +194,41 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
           }
         }
       },
       "post": {
         "operationId": "coursesLessonsCreate",
+        "summary": "Добавление урока в курс",
         "parameters": [
           {
             "name": "courseId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
@@ -157,6 +243,16 @@
               }
             }
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Access is unauthorized.",
             "content": {
@@ -167,12 +263,42 @@
               }
             }
           },
+          "403": {
+            "description": "Access is forbidden.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Client error",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnprocessableEntityError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -198,13 +324,16 @@
     "/courses/{courseId}/lessons/{id}": {
       "get": {
         "operationId": "coursesLessonsShow",
+        "summary": "Урок курса",
         "parameters": [
           {
             "name": "courseId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           },
           {
@@ -212,7 +341,9 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
@@ -227,12 +358,32 @@
               }
             }
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The server cannot find the requested resource.",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -243,13 +394,16 @@
     "/courses/{id}": {
       "get": {
         "operationId": "coursesShow",
+        "summary": "Курс по идентификатору",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
@@ -260,6 +414,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Course"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
@@ -273,18 +437,31 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
           }
         }
       },
       "put": {
         "operationId": "coursesUpdate",
+        "summary": "Изменение курса",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
@@ -299,12 +476,32 @@
               }
             }
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Access is unauthorized.",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access is forbidden.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
                 }
               }
             }
@@ -325,6 +522,16 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnprocessableEntityError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -348,19 +555,32 @@
       },
       "delete": {
         "operationId": "coursesDestroy",
+        "summary": "Удаление курса",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
         "responses": {
           "204": {
             "description": "There is no content to send for this request, but the headers may be useful. "
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Access is unauthorized.",
@@ -372,12 +592,32 @@
               }
             }
           },
+          "403": {
+            "description": "Access is forbidden.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The server cannot find the requested resource.",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -393,6 +633,7 @@
     "/tokens": {
       "post": {
         "operationId": "tokensCreate",
+        "summary": "Выдача токена по email и паролю",
         "parameters": [],
         "responses": {
           "201": {
@@ -405,12 +646,42 @@
               }
             }
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Client error",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnprocessableEntityError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -431,13 +702,16 @@
     "/users": {
       "get": {
         "operationId": "usersIndex",
+        "summary": "Список пользователей",
         "parameters": [
           {
             "name": "page",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "number",
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
               "default": 1
             },
             "explode": false
@@ -464,6 +738,36 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -474,6 +778,7 @@
       },
       "post": {
         "operationId": "usersCreate",
+        "summary": "Регистрация пользователя",
         "parameters": [],
         "responses": {
           "201": {
@@ -486,12 +791,32 @@
               }
             }
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Client error",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnprocessableEntityError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -512,13 +837,16 @@
     "/users/{id}": {
       "get": {
         "operationId": "usersShow",
+        "summary": "Пользователь по идентификатору",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
@@ -533,12 +861,42 @@
               }
             }
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The server cannot find the requested resource.",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -552,13 +910,16 @@
       },
       "put": {
         "operationId": "usersUpdate",
+        "summary": "Изменение пользователя",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
@@ -569,6 +930,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
                 }
               }
             }
@@ -589,6 +970,16 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnprocessableEntityError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -612,13 +1003,16 @@
       },
       "delete": {
         "operationId": "usersDestroy",
+        "summary": "Удаление пользователя",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
             }
           }
         ],
@@ -626,12 +1020,42 @@
           "204": {
             "description": "There is no content to send for this request, but the headers may be useful. "
           },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The server cannot find the requested resource.",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
                 }
               }
             }
@@ -658,6 +1082,27 @@
             "type": "string"
           },
           "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "BadRequestError": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
             "type": "string"
           }
         }
@@ -820,6 +1265,26 @@
           }
         }
       },
+      "TooManyRequestsError": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          }
+        }
+      },
       "UnauthorizedError": {
         "type": "object",
         "properties": {
@@ -910,14 +1375,22 @@
       "UserCreateDTO": {
         "type": "object",
         "required": [
-          "email"
+          "email",
+          "password"
         ],
         "properties": {
           "fullName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
           },
           "email": {
             "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password"
           }
         }
       },
@@ -925,7 +1398,14 @@
         "type": "object",
         "properties": {
           "fullName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password"
           }
         }
       },
@@ -943,5 +1423,12 @@
         "scheme": "Bearer"
       }
     }
-  }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Локальная разработка",
+      "variables": {}
+    }
+  ]
 }

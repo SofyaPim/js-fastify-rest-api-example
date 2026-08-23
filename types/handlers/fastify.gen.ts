@@ -10,11 +10,13 @@ import type {
   CoursesDestroyErrors,
   CoursesDestroyResponses,
   CoursesIndexData,
+  CoursesIndexErrors,
   CoursesIndexResponses,
   CoursesLessonsCreateData,
   CoursesLessonsCreateErrors,
   CoursesLessonsCreateResponses,
   CoursesLessonsIndexData,
+  CoursesLessonsIndexErrors,
   CoursesLessonsIndexResponses,
   CoursesLessonsShowData,
   CoursesLessonsShowErrors,
@@ -35,6 +37,7 @@ import type {
   UsersDestroyErrors,
   UsersDestroyResponses,
   UsersIndexData,
+  UsersIndexErrors,
   UsersIndexResponses,
   UsersShowData,
   UsersShowErrors,
@@ -47,7 +50,7 @@ import type {
 export type RouteHandlers = {
   coursesIndex: RouteHandler<{
     Querystring?: CoursesIndexData["query"];
-    Reply: CoursesIndexResponses;
+    Reply: CoursesIndexErrors & CoursesIndexResponses;
   }>;
   coursesCreate: RouteHandler<{
     Body: CoursesCreateData["body"];
@@ -56,7 +59,7 @@ export type RouteHandlers = {
   coursesLessonsIndex: RouteHandler<{
     Params: CoursesLessonsIndexData["path"];
     Querystring?: CoursesLessonsIndexData["query"];
-    Reply: CoursesLessonsIndexResponses;
+    Reply: CoursesLessonsIndexErrors & CoursesLessonsIndexResponses;
   }>;
   coursesLessonsCreate: RouteHandler<{
     Body: CoursesLessonsCreateData["body"];
@@ -86,7 +89,7 @@ export type RouteHandlers = {
   }>;
   usersIndex: RouteHandler<{
     Querystring?: UsersIndexData["query"];
-    Reply: UsersIndexResponses;
+    Reply: UsersIndexErrors & UsersIndexResponses;
   }>;
   usersCreate: RouteHandler<{
     Body: UsersCreateData["body"];
