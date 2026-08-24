@@ -1,20 +1,30 @@
 import { httpErrors } from "@fastify/sensible";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 
 import * as schemas from "../../../db/schema.ts";
-import { defineHandlers, ensure, getPagingOptions } from "../../../lib/utils.ts";
+import { buildPageMeta, defineHandlers, ensure, getPagingOptions } from "../../../lib/utils.ts";
 import CoursePolicy from "../../../policies/CoursePolicy.ts";
 import LessonValidator from "../../../validators/Course/LessonValidator.ts";
 
 const handlers = defineHandlers({
   async coursesLessonsIndex(request, reply) {
     const page = request.query?.page ?? 1;
+    const perPage = request.query?.perPage ?? 10;
+    const scope = eq(schemas.courseLessons.courseId, request.params.courseId);
+
     const lessons = await request.db.query.courseLessons.findMany({
-      where: eq(schemas.courseLessons.courseId, request.params.courseId),
+      where: scope,
       orderBy: asc(schemas.courseLessons.id),
-      ...getPagingOptions(page, 10),
+      ...getPagingOptions(page, perPage),
     });
-    return reply.code(200).send({ data: lessons });
+    // Счёт по тому же условию, что и выборка: total должен быть числом уроков
+    // этого курса, а не всех.
+    const [{ total }] = await request.db
+      .select({ total: count() })
+      .from(schemas.courseLessons)
+      .where(scope);
+
+    return reply.code(200).send({ data: lessons, meta: buildPageMeta(page, perPage, total) });
   },
 
   async coursesLessonsShow(request, reply) {

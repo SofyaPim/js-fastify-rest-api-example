@@ -66,6 +66,13 @@ export type NotFoundError = {
   instance?: string;
 };
 
+export type PageMeta = {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+};
+
 /**
  * https://www.rfc-editor.org/rfc/rfc9457.html
  */
@@ -138,6 +145,7 @@ export type CoursesIndexData = {
   path?: never;
   query?: {
     page?: number;
+    perPage?: number;
   };
   url: "/courses";
 };
@@ -161,6 +169,7 @@ export type CoursesIndexResponses = {
    */
   200: {
     data: Array<Course>;
+    meta: PageMeta;
   };
 };
 
@@ -210,6 +219,7 @@ export type CoursesLessonsIndexData = {
   };
   query?: {
     page?: number;
+    perPage?: number;
   };
   url: "/courses/{courseId}/lessons";
 };
@@ -233,6 +243,7 @@ export type CoursesLessonsIndexResponses = {
    */
   200: {
     data: Array<CourseLesson>;
+    meta: PageMeta;
   };
 };
 
@@ -588,6 +599,7 @@ export type UsersIndexData = {
   path?: never;
   query?: {
     page?: number;
+    perPage?: number;
   };
   url: "/users";
 };
@@ -615,6 +627,7 @@ export type UsersIndexResponses = {
    */
   200: {
     data: Array<User>;
+    meta: PageMeta;
   };
 };
 

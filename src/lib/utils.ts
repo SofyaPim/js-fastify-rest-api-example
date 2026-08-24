@@ -8,6 +8,17 @@ export function getPagingOptions(page: number, perPage = 10) {
   };
 }
 
+// Ответ списка обязан сообщать, где клиент находится: page без total не даёт
+// понять, есть ли следующая страница.
+export function buildPageMeta(page: number, perPage: number, total: number) {
+  return {
+    page,
+    perPage,
+    total,
+    totalPages: Math.ceil(total / perPage),
+  };
+}
+
 // Раньше здесь вызывался createError, который ошибку только создаёт. Из-за
 // этого 404 не наступал никогда: отсутствующая запись давала 200 с пустым
 // телом, а /tokens с неизвестным email — 500 при обращении к полю у undefined.

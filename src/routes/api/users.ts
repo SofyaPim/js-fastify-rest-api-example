@@ -1,8 +1,8 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, count, eq } from "drizzle-orm";
 import { publicUserColumns, publicUserFields } from "../../db/projections.ts";
 import * as schemas from "../../db/schema.ts";
 import { hashPassword } from "../../lib/password.ts";
-import { defineHandlers, ensure, getPagingOptions } from "../../lib/utils.ts";
+import { buildPageMeta, defineHandlers, ensure, getPagingOptions } from "../../lib/utils.ts";
 import UserValidator from "../../validators/UserValidator.ts";
 
 // Каждый запрос ограничен публичной проекцией из db/projections.ts: в строке
@@ -10,13 +10,16 @@ import UserValidator from "../../validators/UserValidator.ts";
 const handlers = defineHandlers({
   async usersIndex(request, reply) {
     const page = request.query?.page ?? 1;
+    const perPage = request.query?.perPage ?? 10;
+
     const users = await request.db.query.users.findMany({
       columns: publicUserColumns,
       orderBy: asc(schemas.users.id),
-      ...getPagingOptions(page, 1),
+      ...getPagingOptions(page, perPage),
     });
+    const [{ total }] = await request.db.select({ total: count() }).from(schemas.users);
 
-    return reply.code(200).send({ data: users });
+    return reply.code(200).send({ data: users, meta: buildPageMeta(page, perPage, total) });
   },
 
   async usersShow(request, reply) {

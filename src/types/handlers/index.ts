@@ -81,6 +81,7 @@ export type {
   CoursesUpdateResponses,
   ForbiddenError,
   NotFoundError,
+  PageMeta,
   ProblemDetails,
   Timestamps,
   TokenInfo,

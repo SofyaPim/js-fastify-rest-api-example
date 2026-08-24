@@ -64,6 +64,25 @@ export const zNotFoundError = z.object({
   instance: z.string().optional(),
 });
 
+export const zPageMeta = z.object({
+  page: z
+    .int()
+    .min(-2147483648, { error: "Invalid value: Expected int32 to be >= -2147483648" })
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+  perPage: z
+    .int()
+    .min(-2147483648, { error: "Invalid value: Expected int32 to be >= -2147483648" })
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+  total: z
+    .int()
+    .min(-2147483648, { error: "Invalid value: Expected int32 to be >= -2147483648" })
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+  totalPages: z
+    .int()
+    .min(-2147483648, { error: "Invalid value: Expected int32 to be >= -2147483648" })
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+});
+
 /**
  * https://www.rfc-editor.org/rfc/rfc9457.html
  */
@@ -138,6 +157,7 @@ export const zCoursesIndexQuery = z.object({
     .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" })
     .optional()
     .default(1),
+  perPage: z.int().gte(1).lte(100).optional().default(10),
 });
 
 /**
@@ -145,6 +165,7 @@ export const zCoursesIndexQuery = z.object({
  */
 export const zCoursesIndexResponse = z.object({
   data: z.array(zCourse),
+  meta: zPageMeta,
 });
 
 export const zCoursesCreateBody = zCourseCreateDto;
@@ -168,6 +189,7 @@ export const zCoursesLessonsIndexQuery = z.object({
     .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" })
     .optional()
     .default(1),
+  perPage: z.int().gte(1).lte(100).optional().default(10),
 });
 
 /**
@@ -175,6 +197,7 @@ export const zCoursesLessonsIndexQuery = z.object({
  */
 export const zCoursesLessonsIndexResponse = z.object({
   data: z.array(zCourseLesson),
+  meta: zPageMeta,
 });
 
 export const zCoursesLessonsCreateBody = zCourseLessonCreateDto;
@@ -293,6 +316,7 @@ export const zUsersIndexQuery = z.object({
     .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" })
     .optional()
     .default(1),
+  perPage: z.int().gte(1).lte(100).optional().default(10),
 });
 
 /**
@@ -300,6 +324,7 @@ export const zUsersIndexQuery = z.object({
  */
 export const zUsersIndexResponse = z.object({
   data: z.array(zUser),
+  meta: zPageMeta,
 });
 
 export const zUsersCreateBody = zUserCreateDto;

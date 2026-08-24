@@ -1,19 +1,23 @@
 import { httpErrors } from "@fastify/sensible";
-import { asc, eq } from "drizzle-orm";
+import { asc, count, eq } from "drizzle-orm";
 
 import * as schemas from "../../db/schema.ts";
-import { defineHandlers, ensure, getPagingOptions } from "../../lib/utils.ts";
+import { buildPageMeta, defineHandlers, ensure, getPagingOptions } from "../../lib/utils.ts";
 import CoursePolicy from "../../policies/CoursePolicy.ts";
 import CourseValidator from "../../validators/CourseValidator.ts";
 
 const handlers = defineHandlers({
   async coursesIndex(request, reply) {
     const page = request.query?.page ?? 1;
+    const perPage = request.query?.perPage ?? 10;
+
     const courses = await request.db.query.courses.findMany({
       orderBy: asc(schemas.courses.id),
-      ...getPagingOptions(page, 10),
+      ...getPagingOptions(page, perPage),
     });
-    return reply.code(200).send({ data: courses });
+    const [{ total }] = await request.db.select({ total: count() }).from(schemas.courses);
+
+    return reply.code(200).send({ data: courses, meta: buildPageMeta(page, perPage, total) });
   },
 
   async coursesShow(request, reply) {

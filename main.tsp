@@ -83,6 +83,16 @@ model UnprocessableEntityError {
   }>;
 }
 
+// Ответ списка сообщает, где клиент находится и сколько всего есть. Без этого
+// page уходил в запрос, а обратно не возвращалось ничего: узнать, есть ли
+// следующая страница, было нельзя.
+model PageMeta {
+  page: int32;
+  perPage: int32;
+  total: int32;
+  totalPages: int32;
+}
+
 model Timestamps {
   // createdAt: utcDateTime;
 }
@@ -178,9 +188,13 @@ namespace users {
   @operationId("usersIndex")
   @get
   @useAuth(BearerAuth)
-  op index(@query @minValue(1) page?: int32 = 1): {
+  op index(
+    @query @minValue(1) page?: int32 = 1,
+    @query @minValue(1) @maxValue(100) perPage?: int32 = 10,
+  ): {
     @body users: {
       data: User[];
+      meta: PageMeta;
     };
   } | UnauthorizedError | CommonErrors;
 
@@ -233,9 +247,13 @@ namespace courses {
   @summary("Список курсов")
   @get
   @operationId("coursesIndex")
-  op index(@query @minValue(1) page?: int32 = 1): {
+  op index(
+    @query @minValue(1) page?: int32 = 1,
+    @query @minValue(1) @maxValue(100) perPage?: int32 = 10,
+  ): {
     @body courses: {
       data: Course[];
+      meta: PageMeta;
     };
   } | CommonErrors;
 
@@ -283,9 +301,14 @@ namespace courses_lessons {
   @summary("Список уроков курса")
   @get
   @operationId("coursesLessonsIndex")
-  op index(@path @minValue(1) courseId: int32, @query @minValue(1) page?: int32 = 1): {
+  op index(
+    @path @minValue(1) courseId: int32,
+    @query @minValue(1) page?: int32 = 1,
+    @query @minValue(1) @maxValue(100) perPage?: int32 = 10,
+  ): {
     @body lessons: {
       data: CourseLesson[];
+      meta: PageMeta;
     };
   } | CommonErrors;
 
