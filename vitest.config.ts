@@ -25,6 +25,9 @@ export default defineConfig({
       thresholds: { lines: 95, functions: 95, branches: 80, statements: 95 },
     },
     env: {
+      // Отключает чтение .env в plugins/env.ts — тесты не должны зависеть от
+      // локального файла.
+      NODE_ENV: "test",
       // Боевая цена scrypt — ~230 мс на хеш, а сиды прогоняются на каждый
       // build(). Стоимость лежит внутри дайджеста, так что проверка от этого
       // не ломается.

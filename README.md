@@ -33,8 +33,7 @@ REST API на [Fastify](https://fastify.dev/), собранный «по-взр�
 ## Запуск
 
 ```bash
-make setup   # зависимости и .env из шаблона
-             # дальше впишите JWT_SECRET — команда есть внутри .env
+make setup
 make dev
 make test
 ```

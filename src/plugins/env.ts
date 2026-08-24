@@ -19,7 +19,11 @@ const schema = {
 
 export default fp(
   async (fastify) => {
-    await fastify.register(env, { schema, dotenv: true });
+    // .env не читается в тестах: иначе они начинают зависеть от локального
+    // файла разработчика, а проверка «без секрета приложение не поднимается»
+    // ломается — dotenv подтягивает секрет обратно после его удаления из
+    // окружения. В тестах переменные приходят из vitest.config.ts.
+    await fastify.register(env, { schema, dotenv: process.env.NODE_ENV !== "test" });
   },
   { name: "env" },
 );
