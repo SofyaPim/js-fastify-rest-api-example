@@ -85,6 +85,25 @@ mock:
 install:
 	pnpm install
 
-.PHONY: install test dev check-types deps-update routes migration-generate \
+# Первичная настройка: зависимости и локальный .env.
+setup: install env
+
+# Существующий .env не трогается вовсе: в нём могут лежать посторонние секреты,
+# и досыпать в чужой конфиг — не дело этой цели. JWT_SECRET в шаблоне пустой,
+# так что после копирования его нужно вписать руками (команда — в .env.example).
+# Приложение до этого не поднимется, и это лучше, чем старт с секретом,
+# закоммиченным в публичный репозиторий.
+#
+# Проверка через test, а не через `cp -n`: тот при существующей цели возвращает 1
+# на BSD и 0 на GNU, и сообщение врало бы на одной из систем.
+env:
+	@if [ -f .env ]; then \
+		echo ".env уже есть — не трогаю"; \
+	else \
+		cp .env.example .env; \
+		echo "создан .env из .env.example — впишите JWT_SECRET (команда внутри файла)"; \
+	fi
+
+.PHONY: install setup env test dev check-types deps-update routes migration-generate \
 	lint lint-fix generate-openapi generate-openapi-ts-types generate-types \
 	generate-check migration-check mock test-coverage lint-openapi contract-test

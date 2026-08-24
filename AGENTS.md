@@ -26,9 +26,11 @@
 
 ## Build, Test, and Development Commands
 
-- `make install` — установка.
-- `make dev` — запуск с перезагрузкой на http://localhost:3000. Требует `.env`
-  (см. `.env.example`).
+- `make setup` — зависимости и `.env` из шаблона. Существующий `.env` не
+  трогается; `JWT_SECRET` вписывается руками.
+- `make install` — только зависимости.
+- `make dev` — запуск с перезагрузкой на http://localhost:3000. Требует `.env`,
+  как и `make routes`.
 - `make test` / `make test-coverage` — vitest, второй с порогами покрытия.
 - `make lint` / `make lint-fix` — oxlint, tsc, формат и линт спеки.
 - `make generate-types` — OpenAPI из TypeSpec и всё сгенерированное из него.
