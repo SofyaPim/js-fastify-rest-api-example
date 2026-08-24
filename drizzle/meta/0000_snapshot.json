@@ -1,5 +1,5 @@
 {
-  "id": "f0b51729-a97e-4851-a191-5adf4dcd5eb4",
+  "id": "c9c0ac47-e9dd-4601-a223-fb4a108c17c1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -31,8 +31,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "courseId": {
-          "name": "courseId",
+        "course_id": {
+          "name": "course_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -58,12 +58,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "course_lessons_courseId_courses_id_fk": {
-          "name": "course_lessons_courseId_courses_id_fk",
+        "course_lessons_course_id_courses_id_fk": {
+          "name": "course_lessons_course_id_courses_id_fk",
           "tableFrom": "course_lessons",
           "tableTo": "courses",
           "columnsFrom": [
-            "courseId"
+            "course_id"
           ],
           "columnsTo": [
             "id"

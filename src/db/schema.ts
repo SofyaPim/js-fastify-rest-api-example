@@ -51,7 +51,7 @@ export const courseLessons = pgTable("course_lessons", {
   name: text("name").notNull(),
   // Тоже запрет, хотя урок вне курса не существует: удаление уроков делает
   // обработчик в транзакции. Поведение видно в коде, а не только в миграции.
-  courseId: integer("courseId")
+  courseId: integer("course_id")
     .references(() => courses.id, { onDelete: "restrict" })
     .notNull(),
   body: text("body").notNull(),
