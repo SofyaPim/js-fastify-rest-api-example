@@ -36,7 +36,7 @@ const handlers = defineHandlers({
       where: eq(schemas.courses.id, request.params.courseId),
     });
     ensure(course, 404);
-    if (!CoursePolicy.canAddLesson(course, request.user.id)) {
+    if (!CoursePolicy.canManageLessons(course, request.user.id)) {
       throw httpErrors.forbidden("You can only add lessons to your own courses");
     }
 
@@ -47,6 +47,57 @@ const handlers = defineHandlers({
     };
     const [lesson] = await request.db.insert(schemas.courseLessons).values(values).returning();
     return reply.code(201).send(lesson);
+  },
+
+  async coursesLessonsUpdate(request, reply) {
+    const course = await request.db.query.courses.findFirst({
+      where: eq(schemas.courses.id, request.params.courseId),
+    });
+    ensure(course, 404);
+    if (!CoursePolicy.canManageLessons(course, request.user.id)) {
+      throw httpErrors.forbidden("You can only change lessons of your own courses");
+    }
+
+    const where = and(
+      eq(schemas.courseLessons.courseId, request.params.courseId),
+      eq(schemas.courseLessons.id, request.params.id),
+    );
+    const existing = await request.db.query.courseLessons.findFirst({ where });
+    ensure(existing, 404);
+
+    const validated = await LessonValidator.validateEdit(request.db, request.body);
+    // Все поля EditDTO необязательные: drizzle на пустом set бросает
+    // «No values to set».
+    if (Object.keys(validated).length === 0) {
+      return reply.code(200).send(existing);
+    }
+
+    const [lesson] = await request.db
+      .update(schemas.courseLessons)
+      .set(validated)
+      .where(where)
+      .returning();
+    return reply.code(200).send(lesson);
+  },
+
+  async coursesLessonsDestroy(request, reply) {
+    const course = await request.db.query.courses.findFirst({
+      where: eq(schemas.courses.id, request.params.courseId),
+    });
+    ensure(course, 404);
+    if (!CoursePolicy.canManageLessons(course, request.user.id)) {
+      throw httpErrors.forbidden("You can only delete lessons of your own courses");
+    }
+
+    const where = and(
+      eq(schemas.courseLessons.courseId, request.params.courseId),
+      eq(schemas.courseLessons.id, request.params.id),
+    );
+    const existing = await request.db.query.courseLessons.findFirst({ where });
+    ensure(existing, 404);
+
+    await request.db.delete(schemas.courseLessons).where(where);
+    return reply.code(204).send();
   },
 });
 

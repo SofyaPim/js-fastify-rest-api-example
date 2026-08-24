@@ -167,6 +167,11 @@ model CourseLessonCreateDTO {
   body: string;
 }
 
+model CourseLessonEditDTO {
+  name?: string;
+  body?: string;
+}
+
 @route("/users")
 namespace users {
   @summary("Список пользователей")
@@ -299,5 +304,31 @@ namespace courses_lessons {
     @body lesson: CourseLesson;
     @statusCode statusCode: 201;
   } | UnprocessableEntityError | UnauthorizedError | ForbiddenError | NotFoundError | CommonErrors;
+
+  @summary("Изменение урока")
+  @put
+  @useAuth(BearerAuth)
+  @operationId("coursesLessonsUpdate")
+  op update(
+    @path @minValue(1) courseId: int32,
+    @path @minValue(1) id: int32,
+    @body lesson: CourseLessonEditDTO,
+  ):
+    | {
+        @body lesson: CourseLesson;
+      }
+    | NotFoundError
+    | UnprocessableEntityError
+    | UnauthorizedError
+    | ForbiddenError
+    | CommonErrors;
+
+  @summary("Удаление урока")
+  @delete
+  @useAuth(BearerAuth)
+  @operationId("coursesLessonsDestroy")
+  op destroy(@path @minValue(1) courseId: int32, @path @minValue(1) id: int32): {
+    @statusCode statusCode: 204;
+  } | NotFoundError | UnauthorizedError | ForbiddenError | CommonErrors;
 }
 

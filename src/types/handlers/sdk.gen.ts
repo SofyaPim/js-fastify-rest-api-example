@@ -21,12 +21,18 @@ import type {
   CoursesLessonsCreateData,
   CoursesLessonsCreateErrors,
   CoursesLessonsCreateResponses,
+  CoursesLessonsDestroyData,
+  CoursesLessonsDestroyErrors,
+  CoursesLessonsDestroyResponses,
   CoursesLessonsIndexData,
   CoursesLessonsIndexErrors,
   CoursesLessonsIndexResponses,
   CoursesLessonsShowData,
   CoursesLessonsShowErrors,
   CoursesLessonsShowResponses,
+  CoursesLessonsUpdateData,
+  CoursesLessonsUpdateErrors,
+  CoursesLessonsUpdateResponses,
   CoursesShowData,
   CoursesShowErrors,
   CoursesShowResponses,
@@ -131,6 +137,22 @@ export const coursesLessonsCreate = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Удаление урока
+ */
+export const coursesLessonsDestroy = <ThrowOnError extends boolean = false>(
+  options: Options<CoursesLessonsDestroyData, ThrowOnError>,
+): RequestResult<CoursesLessonsDestroyResponses, CoursesLessonsDestroyErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    CoursesLessonsDestroyResponses,
+    CoursesLessonsDestroyErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/courses/{courseId}/lessons/{id}",
+    ...options,
+  });
+
+/**
  * Урок курса
  */
 export const coursesLessonsShow = <ThrowOnError extends boolean = false>(
@@ -141,6 +163,26 @@ export const coursesLessonsShow = <ThrowOnError extends boolean = false>(
     CoursesLessonsShowErrors,
     ThrowOnError
   >({ url: "/courses/{courseId}/lessons/{id}", ...options });
+
+/**
+ * Изменение урока
+ */
+export const coursesLessonsUpdate = <ThrowOnError extends boolean = false>(
+  options: Options<CoursesLessonsUpdateData, ThrowOnError>,
+): RequestResult<CoursesLessonsUpdateResponses, CoursesLessonsUpdateErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    CoursesLessonsUpdateResponses,
+    CoursesLessonsUpdateErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/courses/{courseId}/lessons/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 
 /**
  * Удаление курса

@@ -59,6 +59,32 @@ test("a stranger cannot add a lesson to someone else's course", async () => {
   assert.equal(res.statusCode, 403, res.body);
 });
 
+test("a stranger cannot change or delete lessons of someone else's course", async () => {
+  const { app, course, authHeader } = await buildWithOutsider();
+
+  const lesson = await app.db.query.courseLessons.findFirst();
+  assert.ok(lesson);
+
+  const updated = await app.inject({
+    method: "put",
+    url: `/courses/${lesson.courseId}/lessons/${lesson.id}`,
+    headers: { ...authHeader },
+    body: { name: "Hijacked lesson" },
+  });
+  assert.equal(updated.statusCode, 403, updated.body);
+
+  const deleted = await app.inject({
+    method: "delete",
+    url: `/courses/${lesson.courseId}/lessons/${lesson.id}`,
+    headers: { ...authHeader },
+  });
+  assert.equal(deleted.statusCode, 403, deleted.body);
+
+  const survivors = await app.db.query.courseLessons.findMany();
+  assert.ok(survivors.some((item) => item.id === lesson.id));
+  assert.ok(course);
+});
+
 // Несуществующий курс раньше упирался в ограничение внешнего ключа и давал 500.
 test("adding a lesson to a missing course answers 404", async () => {
   const app = await build();

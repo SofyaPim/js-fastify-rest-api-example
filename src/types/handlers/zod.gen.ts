@@ -43,6 +43,11 @@ export const zCourseLessonCreateDto = z.object({
   body: z.string(),
 });
 
+export const zCourseLessonEditDto = z.object({
+  name: z.string().optional(),
+  body: z.string().optional(),
+});
+
 export const zForbiddenError = z.object({
   type: z.string().optional(),
   title: z.string().optional(),
@@ -186,6 +191,22 @@ export const zCoursesLessonsCreatePath = z.object({
  */
 export const zCoursesLessonsCreateResponse = zCourseLesson;
 
+export const zCoursesLessonsDestroyPath = z.object({
+  courseId: z
+    .int()
+    .gte(1)
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+  id: z
+    .int()
+    .gte(1)
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+});
+
+/**
+ * There is no content to send for this request, but the headers may be useful.
+ */
+export const zCoursesLessonsDestroyResponse = z.void();
+
 export const zCoursesLessonsShowPath = z.object({
   courseId: z
     .int()
@@ -201,6 +222,24 @@ export const zCoursesLessonsShowPath = z.object({
  * The request has succeeded.
  */
 export const zCoursesLessonsShowResponse = zCourseLesson;
+
+export const zCoursesLessonsUpdateBody = zCourseLessonEditDto;
+
+export const zCoursesLessonsUpdatePath = z.object({
+  courseId: z
+    .int()
+    .gte(1)
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+  id: z
+    .int()
+    .gte(1)
+    .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
+});
+
+/**
+ * The request has succeeded.
+ */
+export const zCoursesLessonsUpdateResponse = zCourseLesson;
 
 export const zCoursesDestroyPath = z.object({
   id: z

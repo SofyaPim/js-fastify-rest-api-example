@@ -45,6 +45,11 @@ export type CourseLessonCreateDto = {
   body: string;
 };
 
+export type CourseLessonEditDto = {
+  name?: string;
+  body?: string;
+};
+
 export type ForbiddenError = {
   type?: string;
   title?: string;
@@ -283,6 +288,52 @@ export type CoursesLessonsCreateResponses = {
 export type CoursesLessonsCreateResponse =
   CoursesLessonsCreateResponses[keyof CoursesLessonsCreateResponses];
 
+export type CoursesLessonsDestroyData = {
+  body?: never;
+  path: {
+    courseId: number;
+    id: number;
+  };
+  query?: never;
+  url: "/courses/{courseId}/lessons/{id}";
+};
+
+export type CoursesLessonsDestroyErrors = {
+  /**
+   * The server could not understand the request due to invalid syntax.
+   */
+  400: BadRequestError;
+  /**
+   * Access is unauthorized.
+   */
+  401: UnauthorizedError;
+  /**
+   * Access is forbidden.
+   */
+  403: ForbiddenError;
+  /**
+   * The server cannot find the requested resource.
+   */
+  404: NotFoundError;
+  /**
+   * Client error
+   */
+  429: TooManyRequestsError;
+};
+
+export type CoursesLessonsDestroyError =
+  CoursesLessonsDestroyErrors[keyof CoursesLessonsDestroyErrors];
+
+export type CoursesLessonsDestroyResponses = {
+  /**
+   * There is no content to send for this request, but the headers may be useful.
+   */
+  204: void;
+};
+
+export type CoursesLessonsDestroyResponse =
+  CoursesLessonsDestroyResponses[keyof CoursesLessonsDestroyResponses];
+
 export type CoursesLessonsShowData = {
   body?: never;
   path: {
@@ -319,6 +370,56 @@ export type CoursesLessonsShowResponses = {
 
 export type CoursesLessonsShowResponse =
   CoursesLessonsShowResponses[keyof CoursesLessonsShowResponses];
+
+export type CoursesLessonsUpdateData = {
+  body: CourseLessonEditDto;
+  path: {
+    courseId: number;
+    id: number;
+  };
+  query?: never;
+  url: "/courses/{courseId}/lessons/{id}";
+};
+
+export type CoursesLessonsUpdateErrors = {
+  /**
+   * The server could not understand the request due to invalid syntax.
+   */
+  400: BadRequestError;
+  /**
+   * Access is unauthorized.
+   */
+  401: UnauthorizedError;
+  /**
+   * Access is forbidden.
+   */
+  403: ForbiddenError;
+  /**
+   * The server cannot find the requested resource.
+   */
+  404: NotFoundError;
+  /**
+   * Client error
+   */
+  422: UnprocessableEntityError;
+  /**
+   * Client error
+   */
+  429: TooManyRequestsError;
+};
+
+export type CoursesLessonsUpdateError =
+  CoursesLessonsUpdateErrors[keyof CoursesLessonsUpdateErrors];
+
+export type CoursesLessonsUpdateResponses = {
+  /**
+   * The request has succeeded.
+   */
+  200: CourseLesson;
+};
+
+export type CoursesLessonsUpdateResponse =
+  CoursesLessonsUpdateResponses[keyof CoursesLessonsUpdateResponses];
 
 export type CoursesDestroyData = {
   body?: never;

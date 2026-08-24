@@ -15,12 +15,18 @@ import type {
   CoursesLessonsCreateData,
   CoursesLessonsCreateErrors,
   CoursesLessonsCreateResponses,
+  CoursesLessonsDestroyData,
+  CoursesLessonsDestroyErrors,
+  CoursesLessonsDestroyResponses,
   CoursesLessonsIndexData,
   CoursesLessonsIndexErrors,
   CoursesLessonsIndexResponses,
   CoursesLessonsShowData,
   CoursesLessonsShowErrors,
   CoursesLessonsShowResponses,
+  CoursesLessonsUpdateData,
+  CoursesLessonsUpdateErrors,
+  CoursesLessonsUpdateResponses,
   CoursesShowData,
   CoursesShowErrors,
   CoursesShowResponses,
@@ -66,9 +72,18 @@ export type RouteHandlers = {
     Params: CoursesLessonsCreateData["path"];
     Reply: CoursesLessonsCreateErrors & CoursesLessonsCreateResponses;
   }>;
+  coursesLessonsDestroy: RouteHandler<{
+    Params: CoursesLessonsDestroyData["path"];
+    Reply: CoursesLessonsDestroyErrors & CoursesLessonsDestroyResponses;
+  }>;
   coursesLessonsShow: RouteHandler<{
     Params: CoursesLessonsShowData["path"];
     Reply: CoursesLessonsShowErrors & CoursesLessonsShowResponses;
+  }>;
+  coursesLessonsUpdate: RouteHandler<{
+    Body: CoursesLessonsUpdateData["body"];
+    Params: CoursesLessonsUpdateData["path"];
+    Reply: CoursesLessonsUpdateErrors & CoursesLessonsUpdateResponses;
   }>;
   coursesDestroy: RouteHandler<{
     Params: CoursesDestroyData["path"];
