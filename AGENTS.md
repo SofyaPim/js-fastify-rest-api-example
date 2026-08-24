@@ -20,7 +20,10 @@
 - `src/lib/`: утилиты, хеширование паролей, фабрики тестовых данных.
 - `test/`: спеки; бутстрап в `test/helper.ts`. На корне, а не в `src/`, —
   так же, как у генератора fastify.
-- `scripts/`: contract-test.sh.
+- `scripts/`: contract-test.sh и smoke-test.sh.
+- `Dockerfile`, `compose.yaml`: образ без шага сборки — node 26 исполняет
+  TypeScript сам. Сиды в `NODE_ENV=production` не применяются: они тянут
+  `@faker-js/faker` из devDependencies, и в бою фикстурам не место.
 
 Исходники лежат в `src/`, как их раскладывает `fastify generate --lang=ts`.
 Контракт (`main.tsp`, `tsp-output/`) остаётся на корне: генератор про него не
@@ -41,6 +44,7 @@
 - `make migration-generate` / `make migration-check` — миграции и проверка, что
   схема не менялась без миграции.
 - `make contract-test` — schemathesis по спеке (нужен uv).
+- `make smoke-test` — собирает образ и проверяет его (нужен docker).
 - `make mock` — мок-сервер по OpenAPI.
 
 ## Coding Style & Naming Conventions

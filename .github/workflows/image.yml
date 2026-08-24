@@ -1,0 +1,30 @@
+name: Image
+
+# Проверяет собранный образ, а не исходники. При noEmit сборки нет, образ
+# исполняет TypeScript напрямую нодой, и часть поломок видна только в
+# production-установке: так нашлось, что db/seeds.ts тянул @faker-js/faker из
+# devDependencies и боевой запуск не поднимался вовсе.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build and smoke-test the image
+        run: make smoke-test

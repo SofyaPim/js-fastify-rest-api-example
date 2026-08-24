@@ -75,6 +75,10 @@ generate-types: generate-openapi generate-openapi-ts-types
 generate-check: generate-types
 	git diff --exit-code -- tsp-output src/types/handlers
 
+# Проверка собранного образа: см. комментарий в самом скрипте.
+smoke-test:
+	./scripts/smoke-test.sh
+
 # Контрактные тесты поверх спеки: см. комментарий в самом скрипте.
 contract-test:
 	./scripts/contract-test.sh
@@ -95,4 +99,4 @@ env:
 
 .PHONY: install setup env test dev check-types deps-update routes migration-generate \
 	lint lint-fix generate-openapi generate-openapi-ts-types generate-types \
-	generate-check migration-check mock test-coverage lint-openapi contract-test
+	generate-check migration-check mock test-coverage lint-openapi contract-test smoke-test

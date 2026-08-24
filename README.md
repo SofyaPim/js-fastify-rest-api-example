@@ -54,6 +54,7 @@ make generate-check     # проверить, что сгенерированн�
 make lint-openapi       # линт контракта
 make contract-test      # schemathesis по спеке (нужен uv)
 make test-coverage      # тесты с порогами покрытия
+make smoke-test         # собрать образ и проверить его
 make mock               # поднять мок-сервер по OpenAPI
 ```
 
