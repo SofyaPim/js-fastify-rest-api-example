@@ -9,6 +9,10 @@ const schema = {
   required: ["JWT_SECRET"],
   properties: {
     JWT_SECRET: { type: "string", minLength: 32 },
+    // Срок жизни токена. Без него @fastify/jwt подписывает бессрочные: один
+    // раз выданный токен работал бы всегда, а отозвать его можно было только
+    // удалением пользователя.
+    JWT_EXPIRES_IN: { type: "string", default: "1h" },
     NODE_ENV: { type: "string", default: "development" },
     CORS_ORIGIN: { type: "string", default: "*" },
     // Лимит на IP в минуту. В тестах приложение поднимается десятки раз в одном

@@ -21,6 +21,7 @@ declare module "fastify" {
     db: ReturnType<typeof drizzle<typeof schemas>>;
     config: {
       JWT_SECRET: string;
+      JWT_EXPIRES_IN: string;
       NODE_ENV: string;
       CORS_ORIGIN: string;
       RATE_LIMIT_MAX: number;

@@ -9,6 +9,7 @@ export default fp(
   async (fastify: FastifyInstance) => {
     await fastify.register(jwtPlugin, {
       secret: fastify.config.JWT_SECRET,
+      sign: { expiresIn: fastify.config.JWT_EXPIRES_IN },
     });
   },
   { name: "jwt", dependencies: ["env"] },

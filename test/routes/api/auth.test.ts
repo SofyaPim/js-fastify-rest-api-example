@@ -89,6 +89,32 @@ test("a token for a deleted user no longer authenticates", async () => {
   assert.equal(after.statusCode, 401, after.body);
 });
 
+// Токены подписывались без exp, то есть выданный однажды работал вечно, и
+// отозвать его можно было только удалением пользователя.
+test("tokens carry an expiry", async () => {
+  const app = await build();
+  const user = await app.db.query.users.findFirst();
+  assert.ok(user);
+
+  const token = app.jwt.sign({ id: user.id });
+  const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
+  assert.ok("exp" in payload, `в payload нет exp: ${JSON.stringify(payload)}`);
+  assert.ok(payload.exp > payload.iat, "exp не позже iat");
+});
+
+test("an expired token does not authenticate", async () => {
+  const app = await build();
+  const user = await app.db.query.users.findFirst();
+  assert.ok(user);
+
+  const expired = app.jwt.sign({ id: user.id }, { expiresIn: "-1s" });
+  const res = await app.inject({
+    url: "/users",
+    headers: { Authorization: `Bearer ${expired}` },
+  });
+  assert.equal(res.statusCode, 401, res.body);
+});
+
 test("protected operations accept a valid token", async () => {
   const app = await build();
   const authHeader = await getAuthHeader(app);
