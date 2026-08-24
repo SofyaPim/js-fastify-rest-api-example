@@ -4,15 +4,15 @@ import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 // лежит время. Раньше это был integer с unix-миллисекундами, и смысл колонки
 // держался на кодеке drizzle да на комментарии рядом.
 //
-// Таймстемпы ведёт drizzle, а не SQL-дефолты: updatedAt иначе не обновляется
-// никогда — обработчики его не писали, а DEFAULT срабатывает только на INSERT.
+// Начальное значение даёт DEFAULT now() в самой колонке, поэтому строка,
+// вставленная мимо drizzle (psql, сид сырым SQL, backfill в миграции), тоже
+// получает время. Обновление ведёт drizzle: DEFAULT срабатывает только на
+// INSERT, и без $onUpdate updatedAt не менялся бы никогда.
 const timestamps = {
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .$defaultFn(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .$defaultFn(() => new Date())
+    .defaultNow()
     .$onUpdate(() => new Date()),
 };
 
