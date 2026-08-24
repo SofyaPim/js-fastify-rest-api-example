@@ -35,3 +35,14 @@ test("operational routes stay outside the api contract", async () => {
   assert.ok(!paths.includes("/health"), "health попал в контракт");
   assert.ok(!paths.includes("/metrics"), "metrics попал в контракт");
 });
+
+// Честная граница проверяемого: сам SDK поднимается только через --import в
+// скриптах start/dev, поэтому тесты его не исполняют. Проверяется ровно то, что
+// без указанного коллектора трассировка не включается.
+test("tracing stays off without a collector endpoint", async () => {
+  assert.equal(process.env.OTEL_EXPORTER_OTLP_ENDPOINT, undefined);
+
+  const { telemetryEnabled, fastifyOtel } = await import("../../src/telemetry.ts");
+  assert.equal(telemetryEnabled, false);
+  assert.equal(fastifyOtel, undefined);
+});
