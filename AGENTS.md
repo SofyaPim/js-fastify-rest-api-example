@@ -2,22 +2,27 @@
 
 ## Project Structure & Module Organization
 
-- `app.ts`: Fastify entry; автозагружает `plugins/`, а маршруты регистрирует
+- `src/app.ts`: Fastify entry; автозагружает `src/plugins/`, а маршруты регистрирует
   `fastify-openapi-glue` по спеке. Здесь же обработчик ошибок (RFC 9457) и
   securityHandlers.
 - `main.tsp`, `tsp-output/`: контракт на TypeSpec и сгенерированный из него
   OpenAPI. Источник истины для всего остального.
-- `types/handlers/`: сгенерированное из OpenAPI — типы обработчиков, zod-схемы
+- `src/types/handlers/`: сгенерированное из OpenAPI — типы обработчиков, zod-схемы
   и клиент. Руками не правится.
-- `routes/`: обработчики; `routes/index.ts` собирает их в полный
+- `src/routes/`: обработчики; `src/routes/index.ts` собирает их в полный
   `RouteHandlers`, поэтому забытая операция — ошибка компиляции.
-- `plugins/`: конфиг (`env`), база, JWT, security-плагины, документация.
-- `db/`: схема Drizzle, сиды и публичные проекции; `drizzle/` — миграции.
-- `validators/`, `rules/`, `policies/`: бизнес-валидация, правила уровня базы,
+- `src/plugins/`: конфиг (`env`), база, JWT, security-плагины, документация.
+- `src/db/`: схема Drizzle, сиды и публичные проекции; `drizzle/` — миграции (на корне, по соглашению drizzle).
+- `src/validators/`, `src/rules/`, `src/policies/`: бизнес-валидация, правила уровня базы,
   права доступа.
-- `lib/`: утилиты, хеширование паролей, фабрики тестовых данных.
-- `test/`: спеки; бутстрап в `test/helper.ts`.
+- `src/lib/`: утилиты, хеширование паролей, фабрики тестовых данных.
+- `test/`: спеки; бутстрап в `test/helper.ts`. На корне, а не в `src/`, —
+  так же, как у генератора fastify.
 - `scripts/`: contract-test.sh.
+
+Исходники лежат в `src/`, как их раскладывает `fastify generate --lang=ts`.
+Контракт (`main.tsp`, `tsp-output/`) остаётся на корне: генератор про него не
+знает, и это не исходный код, а артефакт.
 
 ## Build, Test, and Development Commands
 
@@ -60,7 +65,7 @@
 
 ## Security & Configuration Tips
 
-- **Секреты**: конфиг проверяется схемой в `plugins/env.ts`. Без `JWT_SECRET`
+- **Секреты**: конфиг проверяется схемой в `src/plugins/env.ts`. Без `JWT_SECRET`
   от 32 символов приложение не поднимается. `.env` не коммитится.
-- **База**: in-memory SQLite (`plugins/drizzle.ts`), пересоздаётся при каждом
+- **База**: in-memory SQLite (`src/plugins/drizzle.ts`), пересоздаётся при каждом
   запуске. Для постоянного хранения нужен файл или настоящая СУБД.

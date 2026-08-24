@@ -16,7 +16,7 @@ export JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
 # подряд и упирается в него, а не в поведение API.
 export RATE_LIMIT_MAX=1000000
 
-pnpm exec fastify start -l error -p "$PORT" app.ts &
+pnpm exec fastify start -l error -p "$PORT" src/app.ts &
 APP_PID=$!
 trap 'kill "$APP_PID" 2>/dev/null || true' EXIT
 

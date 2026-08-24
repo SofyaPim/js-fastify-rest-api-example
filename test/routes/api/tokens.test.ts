@@ -1,8 +1,8 @@
 import { test } from "vitest";
 import * as assert from "node:assert";
 import { buildClient, responseOf } from "../../helper.ts";
-import { DEFAULT_PASSWORD } from "../../../lib/data.ts";
-import { tokensCreate } from "../../../types/handlers/sdk.gen.js";
+import { DEFAULT_PASSWORD } from "../../../src/lib/data.ts";
+import { tokensCreate } from "../../../src/types/handlers/sdk.gen.js";
 
 test("post tokens", async () => {
   const { app, client } = await buildClient();

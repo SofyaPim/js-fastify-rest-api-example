@@ -2,14 +2,14 @@ import { test } from "vitest";
 import * as assert from "node:assert";
 import { pick } from "es-toolkit";
 import { buildClient, getAuthHeader, responseOf } from "../../helper.ts";
-import { buildCourse } from "../../../lib/data.ts";
+import { buildCourse } from "../../../src/lib/data.ts";
 import {
   coursesCreate,
   coursesDestroy,
   coursesIndex,
   coursesShow,
   coursesUpdate,
-} from "../../../types/handlers/sdk.gen.js";
+} from "../../../src/types/handlers/sdk.gen.js";
 
 // Тесты ходят сгенерированным из спеки клиентом: URL, методы и формы тел
 // берутся из контракта, а не переписываются здесь руками.

@@ -11,9 +11,15 @@ export default defineConfig({
       provider: "v8",
       // Сгенерированное и конфиги считать незачем: покрытие должно говорить о
       // коде, который писали руками.
-      // plugins/ не считаем: это обвязка из нескольких строк register(), и
+      // src/plugins/ не считаем: это обвязка из нескольких строк register(), и
       // порог по ней говорил бы не о тестах, а о числе строк в обвязке.
-      include: ["routes/**", "lib/**", "validators/**", "rules/**", "policies/**"],
+      include: [
+        "src/routes/**",
+        "src/lib/**",
+        "src/validators/**",
+        "src/rules/**",
+        "src/policies/**",
+      ],
       // Пороги чуть ниже фактических (100/85/100/97): гейт нужен как храповик
       // против регресса, а не как повод подгонять цифры.
       thresholds: { lines: 95, functions: 95, branches: 80, statements: 95 },

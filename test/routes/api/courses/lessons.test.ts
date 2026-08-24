@@ -1,12 +1,12 @@
 import { test } from "vitest";
 import * as assert from "node:assert";
 import { buildClient, getAuthHeader, responseOf } from "../../../helper.ts";
-import { buildCourseLesson } from "../../../../lib/data.ts";
+import { buildCourseLesson } from "../../../../src/lib/data.ts";
 import {
   coursesLessonsCreate,
   coursesLessonsIndex,
   coursesLessonsShow,
-} from "../../../../types/handlers/sdk.gen.js";
+} from "../../../../src/types/handlers/sdk.gen.js";
 
 test("get lessons", async () => {
   const { app, client } = await buildClient();

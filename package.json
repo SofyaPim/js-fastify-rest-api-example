@@ -3,7 +3,7 @@
   "name": "js-fastify-rest-api-example",
   "description": "REST API на Fastify: контракт на TypeSpec, типы и валидация из OpenAPI, Drizzle ORM.",
   "version": "1.0.0",
-  "main": "app.ts",
+  "main": "src/app.ts",
   "engines": {
     "node": ">=26"
   },
@@ -56,8 +56,8 @@
   },
   "scripts": {
     "test": "vitest run",
-    "start": "fastify start -l info app.ts",
-    "dev": "FASTIFY_AUTOLOAD_TYPESCRIPT=1 fastify start -w -l info -P app.ts",
+    "start": "fastify start -l info src/app.ts",
+    "dev": "FASTIFY_AUTOLOAD_TYPESCRIPT=1 fastify start -w -l info -P src/app.ts",
     "lint": "oxlint --config=.oxlintrc.json .",
     "lint:fix": "oxfmt --ignore-path=.oxfmtignore . && oxlint --config=.oxlintrc.json --fix .",
     "format": "oxfmt --ignore-path=.oxfmtignore .",

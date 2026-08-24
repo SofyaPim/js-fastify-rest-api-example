@@ -3,9 +3,9 @@ import assert from "node:assert";
 import { eq } from "drizzle-orm";
 import Fastify, { type FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
-import app from "../app.ts";
-import * as schemas from "../db/schema.ts";
-import { createClient, createConfig } from "../types/handlers/client/index.js";
+import app from "../src/app.ts";
+import * as schemas from "../src/db/schema.ts";
+import { createClient, createConfig } from "../src/types/handlers/client/index.js";
 
 // Приложение собирается напрямую, а не через helper из fastify-cli. Тот грузит
 // app.ts сам, в обход трансформации vite: из-за этого весь app в тестах был

@@ -17,9 +17,10 @@ deps-update:
 	pnpm exec ncu -u
 
 # Таблица маршрутов целиком: их регистрирует glue по спеке, отдельного файла
-# с маршрутами нет — печатать нужно приложение.
+# с маршрутами нет — печатать нужно приложение. Поэтому цели нужен .env: без
+# JWT_SECRET приложение не поднимается, как и на make dev.
 routes:
-	pnpm exec fastify print-routes app.ts
+	pnpm exec fastify print-routes src/app.ts
 
 migration-generate:
 	pnpm exec drizzle-kit generate
@@ -72,7 +73,7 @@ generate-types: generate-openapi generate-openapi-ts-types
 # без этой цели поломка видна только тому, кто запустит генерацию руками.
 # Миграции drizzle сюда не входят намеренно: их автор создаёт осознанно.
 generate-check: generate-types
-	git diff --exit-code -- tsp-output types/handlers
+	git diff --exit-code -- tsp-output src/types/handlers
 
 # Контрактные тесты поверх спеки: см. комментарий в самом скрипте.
 contract-test:

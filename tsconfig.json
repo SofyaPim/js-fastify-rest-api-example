@@ -14,6 +14,10 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
-  "include": ["**/*.ts"],
+  // Тесты включены наряду с src намеренно. Генератор fastify оставляет в
+  // include только src/**/*.ts, но тогда tsc не проверяет тесты — а именно там
+  // он поймал, что build() из хелпера fastify-cli нетипизирован и весь app в
+  // тестах был any.
+  "include": ["src/**/*.ts", "test/**/*.ts", "*.ts"],
   "exclude": ["node_modules"]
 }

@@ -18,9 +18,9 @@ REST API на [Fastify](https://fastify.dev/), собранный «по-взр�
   спеке регистрирует `fastify-openapi-glue`, поэтому таблица маршрутов и
   проверка запросов тоже не пишутся руками. `make generate-check` в CI не даёт
   сгенерированному разойтись со спекой.
-- **База через [Drizzle](https://orm.drizzle.team/)**: схема в `db/schema.ts`,
+- **База через [Drizzle](https://orm.drizzle.team/)**: схема в `src/db/schema.ts`,
   миграции генерируются по ней.
-- **Валидация входа** отдельным слоем в `validators/`, а не внутри обработчика.
+- **Валидация входа** отдельным слоем в `src/validators/`, а не внутри обработчика.
 - **Авторизация тоже из спеки.** `@useAuth` в контракте применяет
   `fastify-openapi-glue` через securityHandlers, а не `jwtVerify()` в каждом
   обработчике — забыть его негде.

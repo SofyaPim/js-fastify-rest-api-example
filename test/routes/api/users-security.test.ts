@@ -1,7 +1,7 @@
 import { test } from "vitest";
 import * as assert from "node:assert";
 import { build, getAuthHeader } from "../../helper.ts";
-import { buildUser } from "../../../lib/data.ts";
+import { buildUser } from "../../../src/lib/data.ts";
 
 // В строке users лежит passwordDigest, а схема ответа его не отсечёт: у User в
 // контракте нет additionalProperties: false. Единственное, что его удерживает,

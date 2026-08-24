@@ -1,7 +1,7 @@
 import { test } from "vitest";
 import * as assert from "node:assert";
 import { build, getAuthHeader } from "../../helper.ts";
-import { buildCourseLesson } from "../../../lib/data.ts";
+import { buildCourseLesson } from "../../../src/lib/data.ts";
 
 // Возвращает курс и пользователя, который его не создавал.
 async function buildWithOutsider() {

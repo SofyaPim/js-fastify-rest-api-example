@@ -7,13 +7,13 @@ found there. This folder only supplies the implementations.
 
 Note what follows from that, because it differs from the default Fastify
 scaffold: files here are plain handler modules, not encapsulated plugins, and
-`app.ts` does not autoload them (the `@fastify/autoload` call for `routes/` is
+`src/app.ts` does not autoload them (the `@fastify/autoload` call for `src/routes/` is
 deliberately left out). Adding a file does not add an endpoint.
 
 ## How a handler is wired
 
 `fastify-openapi-glue` matches the `operationId` of each operation in the spec
-to a key in the handler map it is given. `routes/index.ts` builds that map:
+to a key in the handler map it is given. `src/routes/index.ts` builds that map:
 
 ```ts
 const serviceHandlers: RouteHandlers = {

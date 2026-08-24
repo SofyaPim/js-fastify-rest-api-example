@@ -1,14 +1,14 @@
 import { test } from "vitest";
 import * as assert from "node:assert";
 import { buildClient, getAuthHeader, responseOf } from "../../helper.ts";
-import { buildUser } from "../../../lib/data.ts";
+import { buildUser } from "../../../src/lib/data.ts";
 import {
   usersCreate,
   usersDestroy,
   usersIndex,
   usersShow,
   usersUpdate,
-} from "../../../types/handlers/sdk.gen.js";
+} from "../../../src/types/handlers/sdk.gen.js";
 
 test("get users", async () => {
   const { app, client } = await buildClient();

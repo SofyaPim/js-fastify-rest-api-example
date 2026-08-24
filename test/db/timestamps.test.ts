@@ -2,8 +2,8 @@ import { test } from "vitest";
 import * as assert from "node:assert";
 import { eq } from "drizzle-orm";
 import { build } from "../helper.ts";
-import { buildUserRecord } from "../../lib/data.ts";
-import * as schemas from "../../db/schema.ts";
+import { buildUserRecord } from "../../src/lib/data.ts";
+import * as schemas from "../../src/db/schema.ts";
 
 // updatedAt не писался никогда: обработчики его не трогали, а SQL-дефолт
 // срабатывает только на INSERT. Теперь его ведёт drizzle через $onUpdate.
