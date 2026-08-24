@@ -12,10 +12,6 @@ BASE="http://127.0.0.1:${PORT}"
 EXAMPLES="${SCHEMATHESIS_EXAMPLES:-20}"
 
 export JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
-# Адрес базы: по умолчанию тот, что публикует сервис db из compose.yaml. Прогон
-# начинается с пересоздания схемы и сидов, поэтому база нужна живая — иначе
-# приложение не поднимется вовсе.
-export DATABASE_URL="${DATABASE_URL:-postgres://api:api@127.0.0.1:5433/api}"
 # Лимитер в контрактном прогоне только мешает: schemathesis шлёт сотни запросов
 # подряд и упирается в него, а не в поведение API.
 export RATE_LIMIT_MAX=1000000
