@@ -115,3 +115,87 @@ test("shared resources answer under both versions", async () => {
     assert.ok(Array.isArray(JSON.parse(res.body).data));
   }
 });
+
+test("v2 update accepts phone and returns it", async () => {
+  const app = await build();
+  const user = await app.db.query.users.findFirst();
+  assert.ok(user);
+  const authHeader = await getAuthHeader(app);
+
+  const res = await app.inject({
+    method: "put",
+    url: `/v2/users/${user.id}`,
+    headers: { ...authHeader },
+    body: { fullName: "Renamed In V2", phone: "+31 20 222 2222" },
+  });
+  assert.equal(res.statusCode, 200, res.body);
+  assert.deepStrictEqual(
+    { fullName: JSON.parse(res.body).fullName, phone: JSON.parse(res.body).phone },
+    { fullName: "Renamed In V2", phone: "+31 20 222 2222" },
+  );
+});
+
+// Пустое тело и в v2 не должно ронять обработчик: drizzle на пустом set бросает
+// «No values to set».
+test("an empty v2 update body leaves the record as it was", async () => {
+  const app = await build();
+  const user = await app.db.query.users.findFirst();
+  assert.ok(user);
+  const authHeader = await getAuthHeader(app);
+
+  const res = await app.inject({
+    method: "put",
+    url: `/v2/users/${user.id}`,
+    headers: { ...authHeader },
+    body: {},
+  });
+  assert.equal(res.statusCode, 200, res.body);
+  assert.equal(JSON.parse(res.body).phone, user.phone);
+});
+
+test("v2 handles missing records and deletion", async () => {
+  const app = await build();
+  const authHeader = await getAuthHeader(app);
+
+  const missing = await app.inject({ url: "/v2/users/999999", headers: { ...authHeader } });
+  assert.equal(missing.statusCode, 404, missing.body);
+
+  const created = await app.inject({
+    method: "post",
+    url: "/v2/users",
+    body: { ...buildUser(), phone: "+31 20 333 3333" },
+  });
+  assert.equal(created.statusCode, 201, created.body);
+  const { id } = JSON.parse(created.body);
+
+  const deleted = await app.inject({
+    method: "delete",
+    url: `/v2/users/${id}`,
+    headers: { ...authHeader },
+  });
+  assert.equal(deleted.statusCode, 204, deleted.body);
+
+  const gone = await app.inject({ url: `/v2/users/${id}`, headers: { ...authHeader } });
+  assert.equal(gone.statusCode, 404);
+
+  const missingDelete = await app.inject({
+    method: "delete",
+    url: "/v2/users/999999",
+    headers: { ...authHeader },
+  });
+  assert.equal(missingDelete.statusCode, 404, missingDelete.body);
+});
+
+// Правило уникальности живёт в валидаторе v2 своей копией, поверх схем v2.
+test("v2 rejects a duplicate email", async () => {
+  const app = await build();
+  const user = await app.db.query.users.findFirst();
+  assert.ok(user);
+
+  const res = await app.inject({
+    method: "post",
+    url: "/v2/users",
+    body: buildUser({ email: user.email.toUpperCase() }),
+  });
+  assert.equal(res.statusCode, 422, res.body);
+});
