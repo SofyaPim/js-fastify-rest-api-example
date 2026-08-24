@@ -29,6 +29,13 @@
       "when": 1787446852568,
       "tag": "0003_common_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1787542465771,
+      "tag": "0004_giant_hammerhead",
+      "breakpoints": true
     }
   ]
 }

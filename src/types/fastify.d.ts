@@ -25,6 +25,8 @@ declare module "fastify" {
       NODE_ENV: string;
       CORS_ORIGIN: string;
       RATE_LIMIT_MAX: number;
+      MAX_EVENT_LOOP_DELAY: number;
+      MAX_EVENT_LOOP_UTILIZATION: number;
     };
   }
   // type FastifyTypebox = FastifyInstance<

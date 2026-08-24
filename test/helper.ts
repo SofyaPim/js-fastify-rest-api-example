@@ -5,7 +5,7 @@ import Fastify, { type FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import app from "../src/app.ts";
 import * as schemas from "../src/db/schema.ts";
-import { createClient, createConfig } from "../src/types/handlers/client/index.js";
+import { createClient, createConfig } from "../src/types/handlers/v1/client/index.js";
 
 // Приложение собирается напрямую, а не через helper из fastify-cli. Тот грузит
 // app.ts сам, в обход трансформации vite: из-за этого весь app в тестах был

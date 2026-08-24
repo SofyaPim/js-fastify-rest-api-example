@@ -22,10 +22,11 @@ export default fp(
         return true;
       },
       healthCheckInterval: 5_000,
-      // Пороги щедрые: под нагрузкой лучше отвечать медленно, чем отдавать 503
-      // на всё подряд. Их и стоит крутить первыми, если понадобится backpressure.
-      maxEventLoopDelay: 1_000,
-      maxEventLoopUtilization: 0.98,
+      // Пороги из конфига: под нагрузкой лучше отвечать медленно, чем отдавать
+      // 503 на всё подряд, а в тестах шеддинг надо выключать вовсе — иначе
+      // параллельный прогон на загруженной машине падает не по вине кода.
+      maxEventLoopDelay: fastify.config.MAX_EVENT_LOOP_DELAY,
+      maxEventLoopUtilization: fastify.config.MAX_EVENT_LOOP_UTILIZATION,
     });
 
     await fastify.register(fastifyMetrics, {

@@ -1,4 +1,4 @@
-import type { RouteHandlers } from "../types/handlers/fastify.gen.ts";
+import type { RouteHandlers } from "../types/handlers/v1/fastify.gen.ts";
 import lessons from "./api/courses/lessons.ts";
 import courses from "./api/courses.ts";
 import tokens from "./api/tokens.ts";

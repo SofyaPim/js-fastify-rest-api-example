@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { users } from "../db/schema.ts";
 import unique from "../rules/unique.ts";
-import { zUserCreateDto, zUserEditDto } from "../types/handlers/zod.gen.ts";
+import { zUserCreateDto, zUserEditDto } from "../types/handlers/v1/zod.gen.ts";
 import type { DrizzleDB } from "../types/index.ts";
 
 // Структуру запроса уже проверил fastify по спецификации, поэтому здесь
@@ -14,7 +14,7 @@ class UserValidator {
       email: z
         .string()
         .toLowerCase()
-        .refine(unique(db, { schema: users, field: "email" }), {
+        .refine(unique(db, { table: users, field: "email" }), {
           message: "email is already taken",
         }),
     });

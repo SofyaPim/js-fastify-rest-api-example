@@ -9,6 +9,7 @@ import glue from "fastify-openapi-glue";
 import * as z from "zod";
 import * as schemas from "./db/schema.ts";
 import serviceHandlers from "./routes/index.ts";
+import serviceHandlersV2 from "./routes/v2/index.ts";
 
 export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
 
@@ -68,26 +69,41 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
   // обработчика с именем схемы (BearerAuth). Руками её писать нельзя: пока
   // jwtVerify вызывался в каждом обработчике, во всех пяти операциях /users
   // его забыли, и список, правка и удаление пользователей были открыты.
-  fastify.register(glue, {
-    // prefix: 'v1',
-    serviceHandlers,
-    securityHandlers: {
-      BearerAuth: async (request: FastifyRequest) => {
-        await request.jwtVerify();
+  const securityHandlers = {
+    BearerAuth: async (request: FastifyRequest) => {
+      await request.jwtVerify();
 
-        // Токен живёт до истечения срока, а пользователя за это время могли
-        // удалить. Без проверки запрос шёл дальше с идентификатором, которого
-        // в базе нет, и падал на внешнем ключе уже в обработчике.
-        const user = await request.db.query.users.findFirst({
-          columns: { id: true },
-          where: eq(schemas.users.id, request.user.id),
-        });
-        if (!user) {
-          throw httpErrors.unauthorized("Token refers to a user that no longer exists");
-        }
-      },
+      // Токен живёт до истечения срока, а пользователя за это время могли
+      // удалить. Без проверки запрос шёл дальше с идентификатором, которого
+      // в базе нет, и падал на внешнем ключе уже в обработчике.
+      const user = await request.db.query.users.findFirst({
+        columns: { id: true },
+        where: eq(schemas.users.id, request.user.id),
+      });
+      if (!user) {
+        throw httpErrors.unauthorized("Token refers to a user that no longer exists");
+      }
     },
+  };
+
+  // v1 остаётся на корне, а не уезжает под /v1: пути в самом документе
+  // OpenAPI префикса не знают, поэтому переезд сделал бы /openapi.json
+  // неправдой — и сломал бы контрактные тесты, клиент и все существующие
+  // интеграции.
+  fastify.register(glue, {
+    serviceHandlers,
+    securityHandlers,
     specification: "./tsp-output/@typespec/openapi3/openapi.v1.json",
+  });
+
+  // v2 отличается от v1 полем phone у User: оно есть в ответах и принимается на
+  // запись. Обработчики курсов, уроков и токенов переиспользуются — расходятся
+  // только пользователи.
+  fastify.register(glue, {
+    prefix: "/v2",
+    serviceHandlers: serviceHandlersV2,
+    securityHandlers,
+    specification: "./tsp-output/@typespec/openapi3/openapi.v2.json",
   });
 
   // This loads all plugins defined in routes

@@ -9,7 +9,7 @@ import {
   coursesIndex,
   coursesShow,
   coursesUpdate,
-} from "../../../src/types/handlers/sdk.gen.js";
+} from "../../../src/types/handlers/v1/sdk.gen.js";
 
 // Тесты ходят сгенерированным из спеки клиентом: URL, методы и формы тел
 // берутся из контракта, а не переписываются здесь руками.

@@ -1,4 +1,4 @@
-import { zCourseLessonCreateDto, zCourseLessonEditDto } from "../../types/handlers/zod.gen.ts";
+import { zCourseLessonCreateDto, zCourseLessonEditDto } from "../../types/handlers/v1/zod.gen.ts";
 import type { DrizzleDB } from "../../types/index.ts";
 
 class LessonValidator {

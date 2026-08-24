@@ -15,6 +15,10 @@ export JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
 # Лимитер в контрактном прогоне только мешает: schemathesis шлёт сотни запросов
 # подряд и упирается в него, а не в поведение API.
 export RATE_LIMIT_MAX=1000000
+# Шеддинг под нагрузкой мешает так же, как лимитер: schemathesis шлёт сотни
+# запросов подряд и упирается в 503, а не в поведение API.
+export MAX_EVENT_LOOP_DELAY=600000
+export MAX_EVENT_LOOP_UTILIZATION=1
 
 # Порт проверяется до запуска: если на нём кто-то уже слушает, прогон уходил в
 # чужой процесс и зеленел, ничего не проверив в текущем коде. Молчаливое ложное
@@ -52,8 +56,24 @@ TOKEN=$(
     node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.parse(d).token))'
 ) || { echo "не удалось получить токен — сиды или пароль разошлись с db/seeds.ts" >&2; exit 1; }
 
-uvx --from schemathesis st run "$BASE/openapi.json" \
-  --url "$BASE" \
-  -H "Authorization: Bearer $TOKEN" \
-  -c not_a_server_error,ignored_auth,status_code_conformance,content_type_conformance,response_schema_conformance \
-  --max-examples "$EXAMPLES"
+CHECKS=not_a_server_error,ignored_auth,status_code_conformance,content_type_conformance,response_schema_conformance
+
+# Обе версии: v2 отличается от v1 полем phone у User, и без отдельного прогона
+# он остался бы непроверенным. Документ v2 несёт servers с префиксом, поэтому
+# --url указывает туда же.
+for version in v1 v2; do
+  if [ "$version" = "v1" ]; then
+    document="$BASE/openapi.json"
+    target="$BASE"
+  else
+    document="$BASE/v2/openapi.json"
+    target="$BASE/v2"
+  fi
+
+  echo "== контрактные тесты $version =="
+  uvx --from schemathesis st run "$document" \
+    --url "$target" \
+    -H "Authorization: Bearer $TOKEN" \
+    -c "$CHECKS" \
+    --max-examples "$EXAMPLES"
+done

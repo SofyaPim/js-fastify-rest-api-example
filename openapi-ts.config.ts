@@ -1,16 +1,11 @@
 import { defineConfig } from "@hey-api/openapi-ts";
 
-export default defineConfig({
-  input: "./tsp-output/@typespec/openapi3/openapi.v1.json",
-  output: "src/types/handlers",
-  plugins: [
-    // Типы обработчиков для defineHandlers и схемы zod для бизнес-валидации:
-    // валидаторы расширяют сгенерированную схему вместо своей копии контракта.
-    "fastify",
-    "zod",
-    // Клиент из той же спеки — им ходят тесты, чтобы не писать URL и методы
-    // руками.
-    "@hey-api/client-fetch",
-    "@hey-api/sdk",
-  ],
+// Обе версии контракта генерируются отдельно: у v2 в User есть phone, которого
+// нет в v1, поэтому типы обработчиков, схемы zod и клиент у них разные.
+const forVersion = (version: "v1" | "v2") => ({
+  input: `./tsp-output/@typespec/openapi3/openapi.${version}.json`,
+  output: `src/types/handlers/${version}`,
+  plugins: ["fastify", "zod", "@hey-api/client-fetch", "@hey-api/sdk"] as const,
 });
+
+export default defineConfig([forVersion("v1"), forVersion("v2")]);

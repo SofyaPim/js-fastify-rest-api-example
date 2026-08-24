@@ -3,7 +3,7 @@ import * as assert from "node:assert";
 import { buildClient, responseOf } from "../../helper.ts";
 import { buildCourse } from "../../../src/lib/data.ts";
 import * as schemas from "../../../src/db/schema.ts";
-import { coursesIndex } from "../../../src/types/handlers/sdk.gen.js";
+import { coursesIndex } from "../../../src/types/handlers/v1/sdk.gen.js";
 
 // page уходил в запрос, а обратно не возвращалось ничего: понять, есть ли
 // следующая страница, клиент по контракту не мог.

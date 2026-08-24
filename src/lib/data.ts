@@ -12,6 +12,8 @@ export function buildUser(params: Partial<User> & { password?: string } = {}) {
     fullName: faker.person.fullName(),
     email: faker.internet.email().toLowerCase(),
     password: DEFAULT_PASSWORD,
+    // В контракте появляется только с v2, но в базе есть всегда: nullable.
+    phone: faker.phone.number({ style: "international" }),
   };
 
   return Object.assign({}, user, params);

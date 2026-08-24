@@ -22,6 +22,10 @@ export const users = sqliteTable("users", {
   fullName: text("full_name"),
   email: text("email").notNull().unique(),
   passwordDigest: text("password_digest").notNull(),
+  // Появляется в контракте только с v2 (@added в main.tsp). Nullable: колонка
+  // добавляется существующей таблице, и NOT NULL упёрся бы в уже лежащие
+  // строки — как было с password_digest.
+  phone: text("phone"),
   ...timestamps,
 });
 

@@ -1,4 +1,4 @@
-import { zCourseCreateDto, zCourseEditDto } from "../types/handlers/zod.gen.ts";
+import { zCourseCreateDto, zCourseEditDto } from "../types/handlers/v1/zod.gen.ts";
 import type { DrizzleDB } from "../types/index.ts";
 
 // Схемы берутся сгенерированными: creatorId обработчик добавляет сам, а

@@ -8,7 +8,7 @@ import {
   usersIndex,
   usersShow,
   usersUpdate,
-} from "../../../src/types/handlers/sdk.gen.js";
+} from "../../../src/types/handlers/v1/sdk.gen.js";
 
 test("get users", async () => {
   const { app, client } = await buildClient();

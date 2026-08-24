@@ -110,7 +110,9 @@ model User {
   @maxLength(100)
   fullName: string | null;
 
-  @added(Versions.v2) phone: string;
+  // Nullable, а не необязательное: колонка добавляется существующей таблице, и
+  // NOT NULL там упёрся бы в уже лежащие строки — как было с password_digest.
+  @added(Versions.v2) phone: string | null;
 
   // @format("email")
   email: string;
@@ -130,6 +132,8 @@ model UserCreateDTO {
   @minLength(8)
   @secret
   password: string;
+
+  @added(Versions.v2) phone?: string;
 }
 
 model UserEditDTO {
@@ -140,6 +144,8 @@ model UserEditDTO {
   @minLength(8)
   @secret
   password?: string;
+
+  @added(Versions.v2) phone?: string;
 }
 
 model Course {

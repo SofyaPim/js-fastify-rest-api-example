@@ -1,5 +1,5 @@
 import { httpErrors } from "@fastify/sensible";
-import type { RouteHandlers } from "../types/handlers/fastify.gen.ts";
+import type { RouteHandlers } from "../types/handlers/v1/fastify.gen.ts";
 
 export function getPagingOptions(page: number, perPage = 10) {
   return {
