@@ -2,6 +2,7 @@ import { httpErrors } from "@fastify/sensible";
 import { asc, count, eq } from "drizzle-orm";
 
 import * as schemas from "../../db/schema.ts";
+import { ensureMatches, entityTag } from "../../lib/etag.ts";
 import { buildPageMeta, defineHandlers, ensure, getPagingOptions } from "../../lib/utils.ts";
 import CoursePolicy from "../../policies/CoursePolicy.ts";
 import CourseValidator from "../../validators/CourseValidator.ts";
@@ -25,7 +26,9 @@ const handlers = defineHandlers({
       where: eq(schemas.courses.id, request.params.id),
     });
     ensure(course, 404);
-    return reply.code(200).send(course);
+    // ETag выставляется здесь, чтобы @fastify/etag не считал его по телу:
+    // клиенту нужен валидатор, который потом можно прислать в If-Match.
+    return reply.header("etag", entityTag(course.updatedAt)).code(200).send(course);
   },
 
   async coursesCreate(request, reply) {
@@ -49,6 +52,7 @@ const handlers = defineHandlers({
     if (!CoursePolicy.canUpdate(course, request.user.id)) {
       throw httpErrors.forbidden("You can only change your own courses");
     }
+    ensureMatches(request.headers["if-match"], course.updatedAt);
 
     const validated = await CourseValidator.validateEdit(request.db, request.body);
     // Все поля CourseEditDTO необязательные, поэтому тело может оказаться
@@ -62,7 +66,7 @@ const handlers = defineHandlers({
       .set(validated)
       .where(eq(schemas.courses.id, request.params.id))
       .returning();
-    return reply.code(200).send(updated);
+    return reply.header("etag", entityTag(updated.updatedAt)).code(200).send(updated);
   },
 
   async coursesDestroy(request, reply) {
@@ -73,6 +77,7 @@ const handlers = defineHandlers({
     if (!CoursePolicy.canDestroy(course, request.user.id)) {
       throw httpErrors.forbidden("You can only delete your own courses");
     }
+    ensureMatches(request.headers["if-match"], course.updatedAt);
 
     await request.db.delete(schemas.courses).where(eq(schemas.courses.id, request.params.id));
     return reply.code(204).send();

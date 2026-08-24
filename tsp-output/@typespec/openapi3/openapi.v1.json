@@ -500,6 +500,16 @@
               }
             }
           },
+          "412": {
+            "description": "Precondition failed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreconditionFailedError"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Client error",
             "content": {
@@ -696,6 +706,15 @@
               "format": "int32",
               "minimum": 1
             }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "description": "ETag из предыдущего GET. Необязателен; если прислан и запись с тех пор\nизменилась, правка отклоняется с 412.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -745,6 +764,16 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Precondition failed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreconditionFailedError"
                 }
               }
             }
@@ -799,6 +828,15 @@
               "format": "int32",
               "minimum": 1
             }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "description": "ETag из предыдущего GET; см. update.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -841,6 +879,16 @@
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Precondition failed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreconditionFailedError"
                 }
               }
             }
@@ -1515,6 +1563,26 @@
           "totalPages": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "PreconditionFailedError": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
           }
         }
       },

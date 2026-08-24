@@ -86,6 +86,7 @@ export type RouteHandlers = {
     Reply: CoursesLessonsUpdateErrors & CoursesLessonsUpdateResponses;
   }>;
   coursesDestroy: RouteHandler<{
+    Headers?: CoursesDestroyData["headers"];
     Params: CoursesDestroyData["path"];
     Reply: CoursesDestroyErrors & CoursesDestroyResponses;
   }>;
@@ -95,6 +96,7 @@ export type RouteHandlers = {
   }>;
   coursesUpdate: RouteHandler<{
     Body: CoursesUpdateData["body"];
+    Headers?: CoursesUpdateData["headers"];
     Params: CoursesUpdateData["path"];
     Reply: CoursesUpdateErrors & CoursesUpdateResponses;
   }>;

@@ -1,14 +1,17 @@
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+// Точность миллисекундная: из updatedAt строится ETag, а при секундной две
+// правки в пределах одной секунды дают одинаковый валидатор.
+//
 // Таймстемпы ведёт drizzle, а не SQL-дефолты: updatedAt иначе не обновляется
 // никогда — обработчики его не писали, а DEFAULT срабатывает только на INSERT.
 // Тип integer, а не text: раньше default (unixepoch()) клал число в текстовую
 // колонку, и наружу уезжала строка вида "1787349516".
 const timestamps = {
-  createdAt: integer("created_at", { mode: "timestamp" })
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),

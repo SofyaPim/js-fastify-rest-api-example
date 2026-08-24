@@ -82,6 +82,7 @@ export type {
   ForbiddenError,
   NotFoundError,
   PageMeta,
+  PreconditionFailedError,
   ProblemDetails,
   Timestamps,
   TokenInfo,

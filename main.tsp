@@ -55,6 +55,12 @@ model TooManyRequestsError {
 alias CommonErrors = BadRequestError | TooManyRequestsError;
 
 @error
+model PreconditionFailedError {
+  @statusCode _: 412;
+  ...ProblemDetails;
+}
+
+@error
 model NotFoundError {
   @statusCode _: 404;
   ...ProblemDetails;
@@ -277,7 +283,16 @@ namespace courses {
   @put
   @useAuth(BearerAuth)
   @operationId("coursesUpdate")
-  op update(@path @minValue(1) id: int32, @body course: CourseEditDTO):
+  op update(
+    @path @minValue(1) id: int32,
+    @body course: CourseEditDTO,
+
+    /**
+     * ETag из предыдущего GET. Необязателен; если прислан и запись с тех пор
+     * изменилась, правка отклоняется с 412.
+     */
+    @header("If-Match") ifMatch?: string,
+  ):
     | {
         @body course: Course;
       }
@@ -285,15 +300,27 @@ namespace courses {
     | UnprocessableEntityError
     | UnauthorizedError
     | ForbiddenError
+    | PreconditionFailedError
     | CommonErrors;
 
   @summary("Удаление курса")
   @delete
   @useAuth(BearerAuth)
   @operationId("coursesDestroy")
-  op destroy(@path @minValue(1) id: int32): {
-    @statusCode statusCode: 204;
-  } | NotFoundError | UnauthorizedError | ForbiddenError | CommonErrors;
+  op destroy(
+    @path @minValue(1) id: int32,
+
+    /** ETag из предыдущего GET; см. update. */
+    @header("If-Match") ifMatch?: string,
+  ):
+    | {
+        @statusCode statusCode: 204;
+      }
+    | NotFoundError
+    | UnauthorizedError
+    | ForbiddenError
+    | PreconditionFailedError
+    | CommonErrors;
 }
 
 @route("/courses/{courseId}/lessons")
@@ -344,6 +371,7 @@ namespace courses_lessons {
     | UnprocessableEntityError
     | UnauthorizedError
     | ForbiddenError
+    | PreconditionFailedError
     | CommonErrors;
 
   @summary("Удаление урока")

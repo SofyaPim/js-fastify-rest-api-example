@@ -73,6 +73,14 @@ export type PageMeta = {
   totalPages: number;
 };
 
+export type PreconditionFailedError = {
+  type?: string;
+  title?: string;
+  status?: number;
+  detail?: string;
+  instance?: string;
+};
+
 /**
  * https://www.rfc-editor.org/rfc/rfc9457.html
  */
@@ -410,6 +418,10 @@ export type CoursesLessonsUpdateErrors = {
    */
   404: NotFoundError;
   /**
+   * Precondition failed.
+   */
+  412: PreconditionFailedError;
+  /**
    * Client error
    */
   422: UnprocessableEntityError;
@@ -434,6 +446,12 @@ export type CoursesLessonsUpdateResponse =
 
 export type CoursesDestroyData = {
   body?: never;
+  headers?: {
+    /**
+     * ETag из предыдущего GET; см. update.
+     */
+    "If-Match"?: string;
+  };
   path: {
     id: number;
   };
@@ -458,6 +476,10 @@ export type CoursesDestroyErrors = {
    * The server cannot find the requested resource.
    */
   404: NotFoundError;
+  /**
+   * Precondition failed.
+   */
+  412: PreconditionFailedError;
   /**
    * Client error
    */
@@ -512,6 +534,13 @@ export type CoursesShowResponse = CoursesShowResponses[keyof CoursesShowResponse
 
 export type CoursesUpdateData = {
   body: CourseEditDto;
+  headers?: {
+    /**
+     * ETag из предыдущего GET. Необязателен; если прислан и запись с тех пор
+     * изменилась, правка отклоняется с 412.
+     */
+    "If-Match"?: string;
+  };
   path: {
     id: number;
   };
@@ -536,6 +565,10 @@ export type CoursesUpdateErrors = {
    * The server cannot find the requested resource.
    */
   404: NotFoundError;
+  /**
+   * Precondition failed.
+   */
+  412: PreconditionFailedError;
   /**
    * Client error
    */

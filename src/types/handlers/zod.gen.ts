@@ -83,6 +83,14 @@ export const zPageMeta = z.object({
     .max(2147483647, { error: "Invalid value: Expected int32 to be <= 2147483647" }),
 });
 
+export const zPreconditionFailedError = z.object({
+  type: z.string().optional(),
+  title: z.string().optional(),
+  status: z.int().optional(),
+  detail: z.string().optional(),
+  instance: z.string().optional(),
+});
+
 /**
  * https://www.rfc-editor.org/rfc/rfc9457.html
  */
@@ -264,6 +272,10 @@ export const zCoursesLessonsUpdatePath = z.object({
  */
 export const zCoursesLessonsUpdateResponse = zCourseLesson;
 
+export const zCoursesDestroyHeaders = z.object({
+  "If-Match": z.string().optional(),
+});
+
 export const zCoursesDestroyPath = z.object({
   id: z
     .int()
@@ -289,6 +301,10 @@ export const zCoursesShowPath = z.object({
 export const zCoursesShowResponse = zCourse;
 
 export const zCoursesUpdateBody = zCourseEditDto;
+
+export const zCoursesUpdateHeaders = z.object({
+  "If-Match": z.string().optional(),
+});
 
 export const zCoursesUpdatePath = z.object({
   id: z
