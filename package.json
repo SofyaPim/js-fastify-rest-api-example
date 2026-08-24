@@ -4,6 +4,9 @@
   "description": "REST API на Fastify: контракт на TypeSpec, типы и валидация из OpenAPI, Drizzle ORM.",
   "version": "1.0.0",
   "main": "src/app.ts",
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "engines": {
     "node": ">=26"
   },

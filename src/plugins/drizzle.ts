@@ -31,9 +31,12 @@ export default fp(
 
     if (!fastify.hasRequestDecorator("db")) {
       fastify.decorate("db", db);
+      // Читается декоратор приложения, а не замыкание: источник базы должен
+      // быть один. Заодно её можно подменить снаружи — тесты так оборачивают
+      // каждый тест в транзакцию и откатывают её.
       fastify.decorateRequest("db", {
         getter() {
-          return db; // общий singleton
+          return fastify.db;
         },
       });
     }

@@ -5,7 +5,10 @@ export default defineConfig({
     environment: "node",
     // Дефолтные 5 секунд малы: build() поднимает приложение целиком, с
     // миграциями и сидами, и на загруженном раннере это не укладывается.
-    testTimeout: 30_000,
+    testTimeout: 60_000,
+    // Тот же запас для хуков: приложение поднимается в beforeAll, и на старте
+    // прогона все файлы делают это одновременно.
+    hookTimeout: 60_000,
     include: ["test/**/*.test.{ts,js}"],
     coverage: {
       provider: "v8",
