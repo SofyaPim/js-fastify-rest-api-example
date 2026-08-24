@@ -3,10 +3,10 @@ import * as assert from "node:assert";
 import { build, getAuthHeader } from "../../helper.ts";
 import { buildUser } from "../../../src/lib/data.ts";
 
-// В строке users лежит passwordDigest, а схема ответа его не отсечёт: у User в
-// контракте нет additionalProperties: false. Единственное, что его удерживает,
-// — публичная проекция в db/projections.ts, и проверять надо каждый эндпоинт,
-// который отдаёт пользователя.
+// В строке users лежит passwordDigest. Наружу его не пускают два слоя:
+// сериализатор fastify пишет ответ строго по схеме операции, а проекция в
+// db/projections.ts не выбирает поле из базы. Проверяется каждый эндпоинт,
+// который отдаёт пользователя, — чтобы падало при отказе любого из двух.
 test("no users endpoint leaks the password digest", async () => {
   const app = await build();
   const authHeader = await getAuthHeader(app);

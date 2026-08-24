@@ -36,6 +36,13 @@
       "when": 1787542465771,
       "tag": "0004_giant_hammerhead",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1787572540422,
+      "tag": "0005_curious_joshua_kane",
+      "breakpoints": true
     }
   ]
 }

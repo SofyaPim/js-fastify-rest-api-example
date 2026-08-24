@@ -23,6 +23,7 @@ export type {
   AuthInfo,
   BadRequestError,
   ClientOptions,
+  ConflictError,
   Course,
   CourseCreateDto,
   CourseEditDto,

@@ -15,6 +15,14 @@ export const zBadRequestError = z.object({
   instance: z.string().optional(),
 });
 
+export const zConflictError = z.object({
+  type: z.string().optional(),
+  title: z.string().optional(),
+  status: z.int().optional(),
+  detail: z.string().optional(),
+  instance: z.string().optional(),
+});
+
 export const zCourse = z.object({
   id: z.number(),
   name: z.string(),

@@ -39,7 +39,10 @@ test("an empty course update body leaves the record as it was", async () => {
   assert.equal(JSON.parse(res.body).name, course.name);
 });
 
-test("deleting a user cascades to the courses they created", async () => {
+// Раньше это делал ON DELETE CASCADE из миграции: удаление автора молча
+// сносило его курсы вместе с уроками. Курс не перестаёт существовать от того,
+// что автор ушёл, поэтому удаление отклоняется.
+test("deleting a user who still owns courses is rejected", async () => {
   const app = await build();
   const course = await app.db.query.courses.findFirst();
   assert.ok(course);
@@ -51,15 +54,29 @@ test("deleting a user cascades to the courses they created", async () => {
     headers: { ...authHeader },
   });
 
-  assert.equal(res.statusCode, 204, res.body);
+  assert.equal(res.statusCode, 409, res.body);
   const left = await app.db.query.courses.findMany();
-  assert.deepStrictEqual(
-    left.filter((item) => item.creatorId === course.creatorId),
-    [],
-  );
+  assert.ok(left.some((item) => item.creatorId === course.creatorId));
 });
 
-test("deleting a course cascades to its lessons", async () => {
+test("a user without courses is deleted", async () => {
+  const app = await build();
+  const users = await app.db.query.users.findMany();
+  const courses = await app.db.query.courses.findMany();
+  const owners = new Set(courses.map((item) => item.creatorId));
+  const free = users.find((user) => !owners.has(user.id));
+  assert.ok(free, "сиды должны содержать пользователя без курсов");
+
+  const authHeader = await getAuthHeader(app, free.id);
+  const res = await app.inject({
+    method: "delete",
+    url: `/users/${free.id}`,
+    headers: { ...authHeader },
+  });
+  assert.equal(res.statusCode, 204, res.body);
+});
+
+test("deleting a course removes its lessons in one transaction", async () => {
   const app = await build();
   const lesson = await app.db.query.courseLessons.findFirst();
   assert.ok(lesson);

@@ -55,6 +55,12 @@ model TooManyRequestsError {
 alias CommonErrors = BadRequestError | TooManyRequestsError;
 
 @error
+model ConflictError {
+  @statusCode _: 409;
+  ...ProblemDetails;
+}
+
+@error
 model PreconditionFailedError {
   @statusCode _: 412;
   ...ProblemDetails;
@@ -240,7 +246,7 @@ namespace users {
   @operationId("usersDestroy")
   op destroy(@path @minValue(1) id: int32): {
     @statusCode statusCode: 204;
-  } | NotFoundError | UnauthorizedError | CommonErrors;
+  } | NotFoundError | UnauthorizedError | ConflictError | CommonErrors;
 }
 
 @route("/tokens")

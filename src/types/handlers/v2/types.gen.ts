@@ -17,6 +17,14 @@ export type BadRequestError = {
   instance?: string;
 };
 
+export type ConflictError = {
+  type?: string;
+  title?: string;
+  status?: number;
+  detail?: string;
+  instance?: string;
+};
+
 export type Course = {
   id: number;
   name: string;
@@ -724,6 +732,10 @@ export type UsersDestroyErrors = {
    * The server cannot find the requested resource.
    */
   404: NotFoundError;
+  /**
+   * The request conflicts with the current state of the server.
+   */
+  409: ConflictError;
   /**
    * Client error
    */

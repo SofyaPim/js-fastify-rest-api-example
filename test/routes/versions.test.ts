@@ -4,9 +4,9 @@ import { build, getAuthHeader } from "../helper.ts";
 import { buildUser } from "../../src/lib/data.ts";
 
 // phone добавлен в User только с v2 (@added в main.tsp). В v1 он появляться не
-// должен: у моделей нет additionalProperties: false, поэтому схема ответа
-// лишнее поле не отсечёт — удерживает его только проекция запроса. Тот же класс
-// утечки, что был у password_digest.
+// должен, и держат это два независимых слоя: сериализатор fastify пишет ответ
+// строго по схеме операции, а проекция не выбирает поле из базы. Тест проверяет
+// результат, а не механизм — сломаться должно, если отвалится любой из двух.
 test("phone appears in v2 and never in v1", async () => {
   const app = await build();
   const authHeader = await getAuthHeader(app);

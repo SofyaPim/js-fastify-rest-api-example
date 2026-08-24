@@ -32,10 +32,11 @@ export const users = sqliteTable("users", {
 export const courses = sqliteTable("courses", {
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
-  // Каскад, а не запрет: контракт обещает у DELETE только 204, и удаление
-  // автора курсов иначе падало в 500 на нарушении внешнего ключа.
+  // Запрет, а не каскад: курс не перестаёт существовать от того, что автор
+  // ушёл. Что делать с осиротевшими курсами — решение приложения, и оно
+  // отвечает 409, а не молча сносит данные из миграции.
   creatorId: integer("creator_id")
-    .references(() => users.id, { onDelete: "cascade" })
+    .references(() => users.id, { onDelete: "restrict" })
     .notNull(),
   description: text("description").notNull(),
   ...timestamps,
@@ -44,8 +45,10 @@ export const courses = sqliteTable("courses", {
 export const courseLessons = sqliteTable("course_lessons", {
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
+  // Тоже запрет, хотя урок вне курса не существует: удаление уроков делает
+  // обработчик в транзакции. Поведение видно в коде, а не только в миграции.
   courseId: integer("courseId")
-    .references(() => courses.id, { onDelete: "cascade" })
+    .references(() => courses.id, { onDelete: "restrict" })
     .notNull(),
   body: text("body").notNull(),
   ...timestamps,

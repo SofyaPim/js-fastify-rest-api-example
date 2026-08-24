@@ -41,5 +41,10 @@ export default fp(
       clearRegisterOnInit: true,
     });
   },
-  { name: "observability" },
+  // Зависимости объявлены явно: плагин читает и fastify.config, и fastify.db.
+  // Без этого avvio грузит его параллельно с drizzle, fastify.db в healthCheck
+  // оказывается undefined, проверка падает — и under-pressure отдаёт 503 на
+  // всё, пока через healthCheckInterval не пройдёт следующая. Проявлялось как
+  // случайные 503 в параллельном прогоне тестов.
+  { name: "observability", dependencies: ["env", "drizzle"] },
 );

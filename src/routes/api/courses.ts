@@ -79,7 +79,15 @@ const handlers = defineHandlers({
     }
     ensureMatches(request.headers["if-match"], course.updatedAt);
 
-    await request.db.delete(schemas.courses).where(eq(schemas.courses.id, request.params.id));
+    // Уроки удаляются явно и в одной транзакции с курсом, а не каскадом из
+    // миграции: урок вне курса не существует, но поведение должно быть видно в
+    // коде и покрыто тестом, а не спрятано в DDL.
+    request.db.transaction((tx) => {
+      tx.delete(schemas.courseLessons)
+        .where(eq(schemas.courseLessons.courseId, request.params.id))
+        .run();
+      tx.delete(schemas.courses).where(eq(schemas.courses.id, request.params.id)).run();
+    });
     return reply.code(204).send();
   },
 });

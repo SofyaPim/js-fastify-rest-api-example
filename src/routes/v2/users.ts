@@ -1,3 +1,4 @@
+import { httpErrors } from "@fastify/sensible";
 import { asc, count, eq } from "drizzle-orm";
 import { publicUserColumnsV2, publicUserFieldsV2 } from "../../db/projections.ts";
 import * as schemas from "../../db/schema.ts";
@@ -73,11 +74,21 @@ const handlers = defineHandlersV2({
   },
 
   async usersDestroy(request, reply) {
-    const [user] = await request.db
-      .delete(schemas.users)
-      .where(eq(schemas.users.id, request.params.id))
-      .returning(publicUserFieldsV2);
-    ensure(user, 404);
+    const existing = await request.db.query.users.findFirst({
+      columns: publicUserColumnsV2,
+      where: eq(schemas.users.id, request.params.id),
+    });
+    ensure(existing, 404);
+
+    const [{ total }] = await request.db
+      .select({ total: count() })
+      .from(schemas.courses)
+      .where(eq(schemas.courses.creatorId, request.params.id));
+    if (total > 0) {
+      throw httpErrors.conflict(`User still owns ${total} course(s)`);
+    }
+
+    await request.db.delete(schemas.users).where(eq(schemas.users.id, request.params.id));
     return reply.code(204).send();
   },
 });
