@@ -15,7 +15,7 @@ const MISSING_ID = 999_999;
 test("get users", async ({ app }) => {
   const authHeader = await getAuthHeader(app);
 
-  const res = await app.inject({ url: "/users", headers: { ...authHeader } });
+  const res = await app.inject({ url: "/v1/users", headers: { ...authHeader } });
   expectStatus(res, 200);
   expect(res.json()).toMatchObject({
     data: expect.any(Array),
@@ -27,7 +27,7 @@ test("get users/:id", async ({ app }) => {
   const user = await firstUser(app);
   const authHeader = await getAuthHeader(app);
 
-  const res = await app.inject({ url: `/users/${user.id}`, headers: { ...authHeader } });
+  const res = await app.inject({ url: `/v1/users/${user.id}`, headers: { ...authHeader } });
   expectStatus(res, 200);
   expect(res.json()).toMatchObject({ id: user.id, email: user.email });
 });
@@ -35,7 +35,7 @@ test("get users/:id", async ({ app }) => {
 test("post users", async ({ app }) => {
   const attrs = buildUser();
 
-  const res = await app.inject({ method: "post", url: "/users", body: attrs });
+  const res = await app.inject({ method: "post", url: "/v1/users", body: attrs });
   expectStatus(res, 201);
   expect(res.json()).toMatchObject({ id: expect.any(Number), email: attrs.email });
 });
@@ -47,7 +47,7 @@ test("post users rejects a duplicate email whatever its case", async ({ app }) =
 
   const res = await app.inject({
     method: "post",
-    url: "/users",
+    url: "/v1/users",
     body: buildUser({ email: user.email.toUpperCase() }),
   });
   expectStatus(res, 422);
@@ -59,7 +59,7 @@ test("put users/:id", async ({ app }) => {
 
   const res = await app.inject({
     method: "put",
-    url: `/users/${user.id}`,
+    url: `/v1/users/${user.id}`,
     headers: { ...authHeader },
     body: { fullName: "Renamed Person" },
   });
@@ -73,7 +73,7 @@ test("delete users/:id", async ({ app }) => {
 
   const res = await app.inject({
     method: "delete",
-    url: `/users/${user.id}`,
+    url: `/v1/users/${user.id}`,
     headers: { ...authHeader },
   });
   expectStatus(res, 204);
@@ -89,10 +89,10 @@ test("delete users/:id", async ({ app }) => {
 // Тела валидные: glue вешает проверку безопасности на preHandler, то есть после
 // валидации запроса, и на кривом теле без токена придёт 400, а не 401.
 const protectedOperations = [
-  { method: "get", url: "/users" },
-  { method: "get", url: "/users/1" },
-  { method: "put", url: "/users/1", body: { fullName: "Someone Else" } },
-  { method: "delete", url: "/users/1" },
+  { method: "get", url: "/v1/users" },
+  { method: "get", url: "/v1/users/1" },
+  { method: "put", url: "/v1/users/1", body: { fullName: "Someone Else" } },
+  { method: "delete", url: "/v1/users/1" },
   { method: "get", url: "/v2/users" },
   { method: "get", url: "/v2/users/1" },
   { method: "put", url: "/v2/users/1", body: { fullName: "Someone Else" } },
@@ -130,7 +130,7 @@ test("no user operation answers without a token", async ({ app }) => {
 // Регистрация — единственная операция пользователей без токена: иначе завести
 // первый аккаунт было бы нечем.
 test("post users needs no token", async ({ app }) => {
-  const res = await app.inject({ method: "post", url: "/users", body: buildUser() });
+  const res = await app.inject({ method: "post", url: "/v1/users", body: buildUser() });
   expectStatus(res, 201);
 });
 
@@ -141,9 +141,9 @@ test("operations on a missing user answer 404", async ({ app }) => {
   const authHeader = await getAuthHeader(app);
 
   const cases = [
-    { method: "get", url: `/users/${MISSING_ID}` },
-    { method: "put", url: `/users/${MISSING_ID}`, body: { fullName: "Nobody At All" } },
-    { method: "delete", url: `/users/${MISSING_ID}` },
+    { method: "get", url: `/v1/users/${MISSING_ID}` },
+    { method: "put", url: `/v1/users/${MISSING_ID}`, body: { fullName: "Nobody At All" } },
+    { method: "delete", url: `/v1/users/${MISSING_ID}` },
     { method: "get", url: `/v2/users/${MISSING_ID}` },
     { method: "delete", url: `/v2/users/${MISSING_ID}` },
   ] as const;
@@ -170,16 +170,16 @@ test("no users endpoint leaks the password digest", async ({ app }) => {
   const authHeader = await getAuthHeader(app);
   const user = await firstUser(app);
 
-  const created = await app.inject({ method: "post", url: "/users", body: buildUser() });
+  const created = await app.inject({ method: "post", url: "/v1/users", body: buildUser() });
   expectStatus(created, 201);
 
   const responses = {
-    index: await app.inject({ url: "/users", headers: { ...authHeader } }),
-    show: await app.inject({ url: `/users/${user.id}`, headers: { ...authHeader } }),
+    index: await app.inject({ url: "/v1/users", headers: { ...authHeader } }),
+    show: await app.inject({ url: `/v1/users/${user.id}`, headers: { ...authHeader } }),
     create: created,
     update: await app.inject({
       method: "put",
-      url: `/users/${user.id}`,
+      url: `/v1/users/${user.id}`,
       headers: { ...authHeader },
       body: { fullName: "Renamed Person" },
     }),
@@ -194,12 +194,12 @@ test("no users endpoint leaks the password digest", async ({ app }) => {
 test("a created user can authenticate with the password they set", async ({ app }) => {
   const attrs = buildUser();
 
-  const created = await app.inject({ method: "post", url: "/users", body: attrs });
+  const created = await app.inject({ method: "post", url: "/v1/users", body: attrs });
   expectStatus(created, 201);
 
   const token = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: attrs.email, password: attrs.password },
   });
   expectStatus(token, 201);
@@ -208,14 +208,14 @@ test("a created user can authenticate with the password they set", async ({ app 
 test("changing the password invalidates the old one", async ({ app }) => {
   const attrs = buildUser();
 
-  const created = await app.inject({ method: "post", url: "/users", body: attrs });
+  const created = await app.inject({ method: "post", url: "/v1/users", body: attrs });
   expectStatus(created, 201);
   const { id } = created.json();
 
   const authHeader = await getAuthHeader(app, id);
   const updated = await app.inject({
     method: "put",
-    url: `/users/${id}`,
+    url: `/v1/users/${id}`,
     headers: { ...authHeader },
     body: { password: "a-brand-new-password" },
   });
@@ -223,14 +223,14 @@ test("changing the password invalidates the old one", async ({ app }) => {
 
   const withOld = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: attrs.email, password: attrs.password },
   });
   expectStatus(withOld, 401);
 
   const withNew = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: attrs.email, password: "a-brand-new-password" },
   });
   expectStatus(withNew, 201);
@@ -244,7 +244,7 @@ test("an empty update body leaves the record as it was", async ({ app }) => {
 
   const res = await app.inject({
     method: "put",
-    url: `/users/${user.id}`,
+    url: `/v1/users/${user.id}`,
     headers: { ...authHeader },
     body: {},
   });
@@ -262,7 +262,7 @@ test("deleting a user who still owns courses is rejected", async ({ app }) => {
 
   const res = await app.inject({
     method: "delete",
-    url: `/users/${course.creatorId}`,
+    url: `/v1/users/${course.creatorId}`,
     headers: { ...authHeader },
   });
   expectStatus(res, 409);
@@ -275,7 +275,7 @@ test("deleting a user who still owns courses is rejected", async ({ app }) => {
 test("a full name shorter than the response model allows is rejected", async ({ app }) => {
   const res = await app.inject({
     method: "post",
-    url: "/users",
+    url: "/v1/users",
     body: { email: "shortname@hexlet.io", fullName: "A", password: "12345678" },
   });
   expectStatus(res, 400);
@@ -290,7 +290,7 @@ test("phone appears in v2 and never in v1", async ({ app }) => {
   const user = await firstUser(app);
   expect(user.phone).toEqual(expect.any(String));
 
-  const v1 = await app.inject({ url: `/users/${user.id}`, headers: { ...authHeader } });
+  const v1 = await app.inject({ url: `/v1/users/${user.id}`, headers: { ...authHeader } });
   expectStatus(v1, 200);
   expect(v1.json()).not.toHaveProperty("phone");
 
@@ -304,12 +304,12 @@ test("no v1 users endpoint leaks phone", async ({ app }) => {
   const user = await firstUser(app);
 
   const responses = {
-    index: await app.inject({ url: "/users", headers: { ...authHeader } }),
-    show: await app.inject({ url: `/users/${user.id}`, headers: { ...authHeader } }),
-    create: await app.inject({ method: "post", url: "/users", body: buildUser() }),
+    index: await app.inject({ url: "/v1/users", headers: { ...authHeader } }),
+    show: await app.inject({ url: `/v1/users/${user.id}`, headers: { ...authHeader } }),
+    create: await app.inject({ method: "post", url: "/v1/users", body: buildUser() }),
     update: await app.inject({
       method: "put",
-      url: `/users/${user.id}`,
+      url: `/v1/users/${user.id}`,
       headers: { ...authHeader },
       body: { fullName: "Renamed Person" },
     }),
@@ -332,7 +332,7 @@ test("v2 accepts phone on create, v1 ignores it", async ({ app }) => {
 
   const viaV1 = await app.inject({
     method: "post",
-    url: "/users",
+    url: "/v1/users",
     body: { ...buildUser(), phone: "+31 20 111 1111" },
   });
   expectStatus(viaV1, 201);

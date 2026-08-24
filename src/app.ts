@@ -109,11 +109,12 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
     },
   };
 
-  // v1 остаётся на корне, а не уезжает под /v1: пути в самом документе
-  // OpenAPI префикса не знают, поэтому переезд сделал бы /openapi.json
-  // неправдой — и сломал бы контрактные тесты, клиент и все существующие
-  // интеграции.
+  // Обе версии живут под своим префиксом, включая первую: по адресу видно, к
+  // какой версии обращается клиент. Пути внутри документа OpenAPI префикса не
+  // знают, его навешивает glue при регистрации, поэтому документу нужен
+  // servers с тем же префиксом. Его подставляет plugins/docs.ts при отдаче.
   fastify.register(glue, {
+    prefix: "/v1",
     serviceHandlers,
     securityHandlers,
     specification: "./tsp-output/@typespec/openapi3/openapi.v1.json",

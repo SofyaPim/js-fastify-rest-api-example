@@ -9,7 +9,7 @@ test("post tokens", async ({ app }) => {
 
   const res = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: user.email, password: DEFAULT_PASSWORD },
   });
   expectStatus(res, 201);
@@ -22,7 +22,7 @@ test("post tokens needs no token itself", async ({ app }) => {
 
   const res = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     headers: {},
     body: { email: user.email, password: DEFAULT_PASSWORD },
   });
@@ -34,7 +34,7 @@ test("post tokens rejects a wrong password", async ({ app }) => {
 
   const res = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: user.email, password: "definitely-not-the-password" },
   });
   expectStatus(res, 401);
@@ -45,7 +45,7 @@ test("post tokens rejects a wrong password", async ({ app }) => {
 test("post tokens rejects an unknown email", async ({ app }) => {
   const res = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: "nobody@hexlet.io", password: DEFAULT_PASSWORD },
   });
   expectStatus(res, 401);
@@ -58,12 +58,12 @@ test("post tokens does not reveal whether an email is registered", async ({ app 
 
   const unknown = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: "nobody@hexlet.io", password: DEFAULT_PASSWORD },
   });
   const wrongPassword = await app.inject({
     method: "post",
-    url: "/tokens",
+    url: "/v1/tokens",
     body: { email: user.email, password: "definitely-not-the-password" },
   });
 
@@ -89,7 +89,7 @@ test("an expired token does not authenticate", async ({ app }) => {
 
   const expired = app.jwt.sign({ id: user.id }, { expiresIn: "-1s" });
   const res = await app.inject({
-    url: "/users",
+    url: "/v1/users",
     headers: { Authorization: `Bearer ${expired}` },
   });
   expectStatus(res, 401);
@@ -101,15 +101,15 @@ test("a token for a deleted user no longer authenticates", async ({ app }) => {
   const user = await firstUser(app);
   const authHeader = await getAuthHeader(app, user.id);
 
-  expectStatus(await app.inject({ url: "/users", headers: { ...authHeader } }), 200);
+  expectStatus(await app.inject({ url: "/v1/users", headers: { ...authHeader } }), 200);
 
   const deleted = await app.inject({
     method: "delete",
-    url: `/users/${user.id}`,
+    url: `/v1/users/${user.id}`,
     headers: { ...authHeader },
   });
   expectStatus(deleted, 204);
 
-  const after = await app.inject({ url: "/users", headers: { ...authHeader } });
+  const after = await app.inject({ url: "/v1/users", headers: { ...authHeader } });
   expectStatus(after, 401);
 });

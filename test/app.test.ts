@@ -33,7 +33,7 @@ test("the app refuses to boot with a too-short JWT secret", async () => {
 });
 
 test("the openapi document and reference page are served", async ({ app }) => {
-  const document = await app.inject({ url: "/openapi.json" });
+  const document = await app.inject({ url: "/v1/openapi.json" });
   expectStatus(document, 200);
   expect(document.json().openapi).toMatch(/^3\./);
 
@@ -47,7 +47,7 @@ test("the openapi document and reference page are served", async ({ app }) => {
 });
 
 test("both versions serve their own document", async ({ app }) => {
-  const v1 = await app.inject({ url: "/openapi.json" });
+  const v1 = await app.inject({ url: "/v1/openapi.json" });
   const v2 = await app.inject({ url: "/v2/openapi.json" });
   expectStatus(v1, 200);
   expectStatus(v2, 200);
@@ -57,9 +57,18 @@ test("both versions serve their own document", async ({ app }) => {
   expect(v1Document.components.schemas.User.properties).not.toHaveProperty("phone");
   expect(v2Document.components.schemas.User.properties).toHaveProperty("phone");
 
-  // Без servers клиент, собранный по документу v2, стучался бы в корень, то
-  // есть в v1.
+  // Без servers клиент, собранный по документу, стучался бы в корень, где
+  // маршрутов нет: префикс версии живёт только в регистрации glue.
+  expect(v1Document.servers).toEqual([{ url: "/v1", description: "Версия 1" }]);
   expect(v2Document.servers).toEqual([{ url: "/v2", description: "Версия 2" }]);
+});
+
+// Корень остаётся пустым: без этой проверки забытая регистрация без префикса
+// прошла бы незамеченной, потому что все остальные тесты ходят по /v1.
+test("the versionless root serves no resources", async ({ app }) => {
+  for (const url of ["/users", "/courses", "/tokens", "/openapi.json"]) {
+    expectStatus(await app.inject({ url }), 404);
+  }
 });
 
 // Все модели ошибок в main.tsp наследуют ProblemDetails, значит и тело должно
@@ -67,7 +76,7 @@ test("both versions serve their own document", async ({ app }) => {
 test("errors are rendered as RFC 9457 problem details", async ({ app }) => {
   const authHeader = await getAuthHeader(app);
 
-  const res = await app.inject({ url: "/users/999999", headers: { ...authHeader } });
+  const res = await app.inject({ url: "/v1/users/999999", headers: { ...authHeader } });
 
   expectStatus(res, 404);
   expect(res.headers["content-type"]).toMatch(/application\/problem\+json/);
@@ -80,7 +89,7 @@ test("errors are rendered as RFC 9457 problem details", async ({ app }) => {
 test("a NUL character in a text field is rejected, not stored", async ({ app }) => {
   const res = await app.inject({
     method: "post",
-    url: "/users",
+    url: "/v1/users",
     body: { email: "nul\u0000@hexlet.io", password: "correct-horse-battery-staple" },
   });
   expectStatus(res, 400);
@@ -99,7 +108,7 @@ test("health reports the app and its database", async ({ app }) => {
 
 test("metrics are exposed in prometheus format", async ({ app }) => {
   // Запрос до снятия метрик, чтобы серия по маршрутам была непустой.
-  await app.inject({ url: "/courses" });
+  await app.inject({ url: "/v1/courses" });
 
   const res = await app.inject({ url: "/metrics" });
   expectStatus(res, 200);
