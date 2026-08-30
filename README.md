@@ -43,7 +43,7 @@ make dev
 make test
 ```
 
-Документация: http://localhost:3000/docs. Сами спеки лежат по адресам
+Документация: <http://localhost:3000/docs>. Сами спеки лежат по адресам
 `/v1/openapi.json` и `/v2/openapi.json`, маршруты версий начинаются с `/v1`
 и `/v2`.
 
