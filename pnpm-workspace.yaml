@@ -9,3 +9,10 @@ allowBuilds:
   'lefthook': true
   'esbuild': true
   'protobufjs': true
+  node-jq: true
+minimumReleaseAgeExclude:
+  - confbox@0.3.0
+  - fast-copy@4.1.1
+  - pkg-types@2.3.2
+  - postcss@8.5.27
+  - rc9@3.1.0
