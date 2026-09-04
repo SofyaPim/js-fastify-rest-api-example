@@ -29,4 +29,10 @@ export default async (db: DrizzleDB) => {
     .values(buildCourse({ creatorId: user2.id }))
     .returning();
   await db.insert(schemas.courseLessons).values(buildCourseLesson({ courseId: course2.id }));
+  const {faker} = await import("@faker-js/faker");
+  await db.insert(schemas.courseReviews).values({
+    rating: faker.number.int({ min: 1, max: 5 }),
+    comment: faker.lorem.paragraph(),
+    courseId: course2.id,
+  });
 };

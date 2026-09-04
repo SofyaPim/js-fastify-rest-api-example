@@ -57,3 +57,14 @@ export const courseLessons = pgTable("course_lessons", {
   body: text("body").notNull(),
   ...timestamps,
 });
+
+export const  courseReviews = pgTable("course_reviews", {
+  id,
+  rating: integer("rating").notNull(),
+  comment: text("comment"),
+  courseId: integer("course_id")
+    .references(() => courses.id, { onDelete: "restrict" })
+    .notNull(), 
+    ...timestamps,
+});
+  // Запрет, а не каскад: отзыв не перестаёт существовать от того, что курс

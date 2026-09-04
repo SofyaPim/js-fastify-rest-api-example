@@ -65,6 +65,9 @@ importers:
       balanced-match:
         specifier: ^4.0.4
         version: 4.0.4
+      better-sqlite3:
+        specifier: ^13.0.3
+        version: 13.0.3
       binary-extensions:
         specifier: ^2.3.0
         version: 2.3.0
@@ -209,12 +212,9 @@ importers:
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.2(@electric-sql/pglite@0.5.8)(@opentelemetry/api@1.9.1)
+        version: 0.45.2(@electric-sql/pglite@0.5.8)(@opentelemetry/api@1.9.1)(better-sqlite3@13.0.3)
       dunder-proto:
         specifier: ^1.0.1
         version: 1.0.1
@@ -1164,9 +1164,15 @@ importers:
         specifier: ^4.5.4
         version: 4.5.4
     devDependencies:
+      '@faker-js/faker':
+        specifier: ^10.6.0
+        version: 10.6.0
       c8:
         specifier: ^11.0.0
         version: 11.0.0
+      drizzle-kit:
+        specifier: ^0.31.10
+        version: 0.31.10
 
 packages:
 
@@ -1648,6 +1654,10 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@faker-js/faker@10.6.0':
+    resolution: {integrity: sha512-3RQHgEtvL1Frl/d1cSreo7qhJ3Gk1OdNUai/CtZ8G+wYeRQnJih3s9xJ9/kgYekPQRdwgh0HXRPqMlzWGwivIQ==}
+    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
   '@faker-js/faker@5.5.3':
     resolution: {integrity: sha512-R11tGE6yIFwqpaIqcfkcg7AICXzFg14+5h5v0TfF/9+RMDL6jhzCy/pxHVOfbALGdtVYdt6JdR21tuxEgl34dw==}
@@ -2351,6 +2361,10 @@ packages:
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
+
+  better-sqlite3@13.0.3:
+    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
+    engines: {node: '>=22'}
 
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
@@ -3464,6 +3478,10 @@ packages:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
 
+  node-addon-api@8.9.2:
+    resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
+    engines: {node: ^18 || ^20 || >= 21}
+
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
     engines: {node: 4.x || >=6.0.0}
@@ -4549,6 +4567,8 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
+  '@faker-js/faker@10.6.0': {}
+
   '@faker-js/faker@5.5.3': {}
 
   '@fastify/ajv-compiler@4.0.6':
@@ -5013,6 +5033,10 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
+  better-sqlite3@13.0.3:
+    dependencies:
+      node-addon-api: 8.9.2
+
   binary-extensions@2.3.0: {}
 
   bintrees@1.0.2: {}
@@ -5224,10 +5248,11 @@ snapshots:
       esbuild: 0.25.12
       tsx: 4.23.13
 
-  drizzle-orm@0.45.2(@electric-sql/pglite@0.5.8)(@opentelemetry/api@1.9.1):
+  drizzle-orm@0.45.2(@electric-sql/pglite@0.5.8)(@opentelemetry/api@1.9.1)(better-sqlite3@13.0.3):
     optionalDependencies:
       '@electric-sql/pglite': 0.5.8
       '@opentelemetry/api': 1.9.1
+      better-sqlite3: 13.0.3
 
   dunder-proto@1.0.1:
     dependencies:
@@ -6032,6 +6057,8 @@ snapshots:
   nanoid@5.1.16: {}
 
   negotiator@0.6.3: {}
+
+  node-addon-api@8.9.2: {}
 
   node-fetch@2.7.0:
     dependencies:

@@ -3,7 +3,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import fp from "fastify-plugin";
-import * as schemas from "../db/schema.ts";
+import * as schemas from "../db/schema.js";
 
 export default fp(
   async (fastify) => {
